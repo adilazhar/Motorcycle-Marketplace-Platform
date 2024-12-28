@@ -16,8 +16,6 @@ class SignupScreenState extends State<SignupScreen> {
   late final TextEditingController _confirmPasswordController;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  // ignore: prefer_final_fields
-  int _currentPage = 0;
 
   void _signUp() async {
     _nextPage();
@@ -49,9 +47,6 @@ class SignupScreenState extends State<SignupScreen> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-    setState(() {
-      _currentPage--;
-    });
   }
 
   void _nextPage() {
@@ -59,9 +54,6 @@ class SignupScreenState extends State<SignupScreen> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-    setState(() {
-      _currentPage++;
-    });
   }
 
   @override
