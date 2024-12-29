@@ -223,11 +223,7 @@ class SignupScreenState extends ConsumerState<SignupScreen> {
                       },
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(),
-                        FormBuilderValidators.hasLowercaseChars(),
-                        FormBuilderValidators.hasNumericChars(),
-                        FormBuilderValidators.hasSpecialChars(),
-                        FormBuilderValidators.hasUppercaseChars(),
-                        FormBuilderValidators.minLength(8),
+                        FormBuilderValidators.password(),
                       ]),
                       decoration: InputDecoration(
                         labelText: 'Password',

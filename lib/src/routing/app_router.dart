@@ -12,6 +12,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
 
+// TODO : Modify the Signup Page To Open the Verification Page direclty
+
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
   CustomTransitionPage buildPageWithDefaultTransition({
@@ -54,9 +56,9 @@ GoRouter appRouter(Ref ref) {
           ref.read(authUserRepositoryProvider).currentUser?.isEmailVerified ??
               false;
 
-      if (isLoggedIn && !isEmailVerified) {
-        return '/signup';
-      }
+      // if (isLoggedIn && !isEmailVerified) {
+      //   return '/signup';
+      // }
 
       if (isLoggedIn) {
         return '/';
