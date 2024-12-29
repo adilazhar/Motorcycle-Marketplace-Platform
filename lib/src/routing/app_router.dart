@@ -1,3 +1,4 @@
+import 'package:bike_listing/src/fetures/authentication/data/auth_user_repository.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/login_screen.dart';
 import 'package:bike_listing/home_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/signup_screen.dart';
@@ -44,18 +45,26 @@ GoRouter appRouter(Ref ref) {
     debugLogDiagnostics: true,
     initialLocation: '/login',
     redirect: (context, state) {
-      // TODO: Add Redirect Logic As Needed
+      // final currentRoute = state.uri.path;
+      final isGoingToLogin = state.uri.path == '/login';
+      final isGoingToSignup = state.uri.path == '/signup';
+      // final isGoingToHome = state.uri.path == '/';
       final isLoggedIn = auth.currentUser != null;
-      if (isLoggedIn) {
-        if (state.uri.path == '/login') {
-          return '/';
-        }
+      final isEmailVerified =
+          ref.read(authUserRepositoryProvider).currentUser?.isEmailVerified ??
+              false;
+
+      if (isLoggedIn && !isEmailVerified) {
+        return '/signup';
       }
-      // else {
-      //   if (state.uri.path != '/login') {
-      //     return '/login';
-      //   }
-      // }
+
+      if (isLoggedIn) {
+        return '/';
+      }
+      if (isLoggedIn && (isGoingToSignup || isGoingToLogin)) {
+        return '/';
+      }
+
       return null;
     },
     refreshListenable: GoRouterRefreshStream(auth.authStateChanges()),

@@ -1,15 +1,34 @@
+// ignore_for_file: use_build_context_synchronously, unused_field, prefer_final_fields
+
+import 'dart:async';
+
+import 'package:bike_listing/src/fetures/authentication/application/app_user_service.dart';
+import 'package:bike_listing/src/fetures/authentication/data/auth_user_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-class SignupScreen extends StatefulWidget {
+// TODO : Set it To Open The Verification Page directly
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
   SignupScreenState createState() => SignupScreenState();
 }
 
-class SignupScreenState extends State<SignupScreen> {
+class SignupScreenState extends ConsumerState<SignupScreen> {
+  final _emailKey = GlobalKey<FormBuilderState>();
+  final _passKey = GlobalKey<FormBuilderState>();
+
+  bool _isLoading = false;
+
+  bool _isUserEmailVerified = false;
+  late Timer _timer;
+
   late final PageController _pageController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -17,43 +36,62 @@ class SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  void _signUp() async {
-    _nextPage();
-    // if (_passwordController.text != _confirmPasswordController.text) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text('Passwords do not match')),
-    //   );
-    //   return;
-    // }
-
-    // try {
-    //   await FirebaseAuth.instance.createUserWithEmailAndPassword(
-    //     email: _emailController.text,
-    //     password: _passwordController.text,
-    //   );
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text('Account created successfully')),
-    //   );
-    //   // Navigate to the home screen or next step
-    // } on FirebaseAuthException catch (e) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text(e.message ?? 'An error occurred')),
-    //   );
-    // }
+  void isUserEmailVerified() {
+    Future(() async {
+      _timer = Timer.periodic(Duration(seconds: 10), (timer) async {
+        await ref.read(appUserServiceProvider).reloadUser();
+        final user = ref.read(authUserRepositoryProvider).currentUser!;
+        if (user.isEmailVerified) {
+          setState(() {
+            _isUserEmailVerified = true;
+          });
+          timer.cancel();
+        }
+      });
+    });
   }
 
-  void _previousPage() {
+  void _signUp() async {
+    if (_passKey.currentState!.saveAndValidate()) {
+      try {
+        setState(() {
+          _isLoading = true;
+        });
+        await ref.read(appUserServiceProvider).createUserWithEmailAndPassword(
+            _emailController.text, _passKey.currentState?.value['pass']);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created successfully')),
+        );
+        _animateToNextPage();
+        setState(() {
+          _isLoading = false;
+        });
+      } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'An error occurred')),
+        );
+      }
+    }
+  }
+
+  void previousPage() {
     _pageController.previousPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
 
-  void _nextPage() {
+  void _animateToNextPage() {
     _pageController.nextPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _moveToPassPage() {
+    if (_emailKey.currentState!.saveAndValidate()) {
+      _animateToNextPage();
+    }
   }
 
   @override
@@ -63,6 +101,16 @@ class SignupScreenState extends State<SignupScreen> {
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -96,12 +144,20 @@ class SignupScreenState extends State<SignupScreen> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  FormBuilder(
+                    key: _emailKey,
+                    child: FormBuilderTextField(
+                      name: 'email',
+                      controller: _emailController,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.email(),
+                      ]),
+                      decoration: InputDecoration(
+                        labelText: 'Enter Email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
@@ -109,7 +165,7 @@ class SignupScreenState extends State<SignupScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _nextPage,
+                      onPressed: _moveToPassPage,
                       child: const Text('Next'),
                     ),
                   ),
@@ -133,86 +189,118 @@ class SignupScreenState extends State<SignupScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  _previousPage();
-                },
+                icon: Icon(Icons.arrow_back,
+                    color: _isLoading ? Colors.grey : Colors.black),
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        previousPage();
+                      },
               ),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: kToolbarHeight + 20),
-                  const Text(
-                    'Create a Password',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
-                      ),
+              child: FormBuilder(
+                key: _passKey,
+                enabled: !_isLoading,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: kToolbarHeight + 20),
+                    const Text(
+                      'Create a Password',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _signUp,
-                      child: const Text('Agree and Create Account'),
-                    ),
-                  ),
-                  const Spacer(),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        context.go('/login');
+                    const SizedBox(height: 20),
+                    FormBuilderTextField(
+                      name: 'pass',
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      autovalidateMode: AutovalidateMode.onUnfocus,
+                      onChanged: (value) {
+                        setState(() {});
                       },
-                      child: const Text('Already have an account? Log in'),
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.hasLowercaseChars(),
+                        FormBuilderValidators.hasNumericChars(),
+                        FormBuilderValidators.hasSpecialChars(),
+                        FormBuilderValidators.hasUppercaseChars(),
+                        FormBuilderValidators.minLength(8),
+                      ]),
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    FormBuilderTextField(
+                      name: 'confirm_pass',
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.equal(
+                          _passwordController.text,
+                          errorText: 'Passwords do not match',
+                        ),
+                      ]),
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _signUp,
+                        child: const Text('Agree and Create Account'),
+                      ),
+                    ),
+                    const Spacer(),
+                    Center(
+                      child: TextButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                context.go('/login');
+                              },
+                        child: const Text('Already have an account? Log in'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
