@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, unused_field, prefer_final_fields
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
 
@@ -13,6 +13,8 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 // TODO : Set it To Open The Verification Page directly
+// TODO : Seperate the pages into different screens
+// TODO : Make Controllers for them
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
@@ -36,7 +38,8 @@ class SignupScreenState extends ConsumerState<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  void isUserEmailVerified() {
+  void _checkEmailVerification() {
+    ref.read(appUserServiceProvider).sendEmailVerification();
     Future(() async {
       _timer = Timer.periodic(Duration(seconds: 10), (timer) async {
         await ref.read(appUserServiceProvider).reloadUser();
@@ -45,6 +48,7 @@ class SignupScreenState extends ConsumerState<SignupScreen> {
           setState(() {
             _isUserEmailVerified = true;
           });
+          context.go('/');
           timer.cancel();
         }
       });
@@ -63,6 +67,7 @@ class SignupScreenState extends ConsumerState<SignupScreen> {
           const SnackBar(content: Text('Account created successfully')),
         );
         _animateToNextPage();
+        _checkEmailVerification();
         setState(() {
           _isLoading = false;
         });

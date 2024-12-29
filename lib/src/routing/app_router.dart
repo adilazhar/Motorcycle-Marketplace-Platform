@@ -47,25 +47,25 @@ GoRouter appRouter(Ref ref) {
     debugLogDiagnostics: true,
     initialLocation: '/login',
     redirect: (context, state) {
-      // final currentRoute = state.uri.path;
+      final currentRoute = state.uri.path;
       final isGoingToLogin = state.uri.path == '/login';
       final isGoingToSignup = state.uri.path == '/signup';
-      // final isGoingToHome = state.uri.path == '/';
+      final isGoingToHome = state.uri.path == '/';
       final isLoggedIn = auth.currentUser != null;
       final isEmailVerified =
           ref.read(authUserRepositoryProvider).currentUser?.isEmailVerified ??
               false;
 
       // if (isLoggedIn && !isEmailVerified) {
-      //   return '/signup';
+      //   return '/signup?goToVerificationPage=true';
       // }
 
-      if (isLoggedIn) {
+      if (isLoggedIn && isEmailVerified) {
         return '/';
       }
-      if (isLoggedIn && (isGoingToSignup || isGoingToLogin)) {
-        return '/';
-      }
+      // if (isLoggedIn &&  (isGoingToSignup || isGoingToLogin)) {
+      //   return '/';
+      // }
 
       return null;
     },
