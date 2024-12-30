@@ -1,4 +1,5 @@
-import 'package:bike_listing/src/fetures/authentication/application/app_user_service.dart';
+import 'package:bike_listing/src/fetures/authentication/presentation/controller/login_screen_controller.dart';
+import 'package:bike_listing/src/utils/async_value_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,40 +14,39 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  bool _isLoading = false;
-
   final _formKey = GlobalKey<FormBuilderState>();
 
   bool _obscurePassword = true;
 
-  void _login() async {
+  void _login() {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
-      try {
-        setState(() {
-          _isLoading = true;
-        });
-        final values = _formKey.currentState!.value;
-        await ref.read(appUserServiceProvider).signInWithEmailAndPassword(
-              values['email'],
-              values['pass'],
-            );
-      } catch (e) {
-        debugPrint(e.toString());
-      }
+      final values = _formKey.currentState!.value;
+      ref.read(loginScreenControllerProvider.notifier).login(
+            values['email'],
+            values['pass'],
+          );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      loginScreenControllerProvider,
+      (_, state) {
+        state.showAlertDialogOnError(context);
+      },
+    );
+    final state = ref.watch(loginScreenControllerProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon:
-              Icon(Icons.close, color: _isLoading ? Colors.grey : Colors.black),
-          onPressed: _isLoading
+          icon: Icon(Icons.close,
+              color: state.isLoading ? Colors.grey : Colors.black),
+          onPressed: state.isLoading
               ? null
               : () {
                   context.go('/');
@@ -57,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         padding: const EdgeInsets.all(16.0),
         child: FormBuilder(
           key: _formKey,
-          enabled: !_isLoading,
+          enabled: !state.isLoading,
           child: Column(
             children: [
               const SizedBox(height: kToolbarHeight + 20),
@@ -115,14 +115,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 10),
               TextButton(
-                onPressed: _isLoading ? null : () {},
+                onPressed: state.isLoading ? null : () {},
                 child: const Text('Forgot your password?'),
               ),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
+                  onPressed: state.isLoading ? null : _login,
                   child: const Text('Log In'),
                 ),
               ),
@@ -130,7 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
-                  onPressed: _isLoading
+                  onPressed: state.isLoading
                       ? null
                       : () {
                           context.go('/signup');

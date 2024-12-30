@@ -60,7 +60,9 @@ GoRouter appRouter(Ref ref) {
       //   return '/signup?goToVerificationPage=true';
       // }
 
-      if (isLoggedIn && isEmailVerified) {
+      if (isLoggedIn &&
+          isEmailVerified &&
+          (isGoingToLogin || isGoingToSignup)) {
         return '/';
       }
       // if (isLoggedIn &&  (isGoingToSignup || isGoingToLogin)) {
