@@ -35,14 +35,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       },
     );
     final state = ref.watch(forgotPasswordScreenControllerProvider);
-    debugPrint(state.toString());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.go('/login'),
+          icon: Icon(Icons.arrow_back,
+              color: state.isLoading ? Colors.grey : Colors.black),
+          onPressed: state.isLoading ? null : () => context.go('/login'),
         ),
       ),
       body: Padding(
@@ -76,6 +76,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             const SizedBox(height: 8),
             FormBuilder(
               key: _emailKey,
+              enabled: !state.isLoading,
               child: FormBuilderTextField(
                 name: 'email',
                 validator: FormBuilderValidators.compose([
@@ -92,7 +93,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: sendResetPassEmail,
+                onPressed: state.isLoading ? null : sendResetPassEmail,
                 child: const Text('Reset Password'),
               ),
             ),

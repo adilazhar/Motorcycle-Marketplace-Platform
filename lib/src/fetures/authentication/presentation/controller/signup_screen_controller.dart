@@ -31,7 +31,7 @@ class SignupScreenController extends _$SignupScreenController {
     final currentState = state.value!;
     ref.read(appUserServiceProvider).sendEmailVerification();
     _verificationTimer = Timer.periodic(
-      const Duration(seconds: 10),
+      const Duration(seconds: 5),
       (timer) async {
         await ref.read(appUserServiceProvider).reloadUser();
         final user = ref.read(authUserRepositoryProvider).currentUser!;
@@ -40,7 +40,10 @@ class SignupScreenController extends _$SignupScreenController {
           state = AsyncData(currentState.copyWith(isEmailVerified: true));
           timer.cancel();
 
-          ref.read(appRouterProvider).go('/');
+          final userName =
+              ref.read(watchAppUserProvider).requireValue!.userName;
+
+          ref.read(appRouterProvider).go('/name_entry/$userName');
         }
       },
     );
@@ -64,6 +67,9 @@ class SignupScreenController extends _$SignupScreenController {
       final newState = currentState.copyWith(
         email: currentState.emailController.text,
       );
+
+      // Initializing the watchAppUser Provider So that i don't have to see the loading screen in the name setup screen
+      ref.read(watchAppUserProvider);
 
       moveToNextPage();
       startEmailVerificationCheck();

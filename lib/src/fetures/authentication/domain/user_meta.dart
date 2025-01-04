@@ -3,16 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Represents user metadata stored in Firestore.
 class UserMeta {
-  final String userName;
+  final String? userName;
   final String? bio;
   final DateTime? joinDate;
-  final String email;
+  final String? email;
 
   UserMeta({
-    required this.userName,
+    this.userName,
     this.bio,
     this.joinDate,
-    required this.email,
+    this.email,
   });
 
   /// factory method for creating usermeta from user input
@@ -36,12 +36,12 @@ class UserMeta {
   /// Creates an instance from a `Map<String, dynamic>`.
   factory UserMeta.fromMap(Map<String, dynamic> map) {
     return UserMeta(
-      userName: map['userName'] as String? ?? '', // Default to empty string
+      userName: map['userName'] as String?, // Default to empty string
       bio: map['bio'] as String?,
       joinDate: map['joinDate'] != null
           ? (map['joinDate'] as Timestamp).toDate()
           : null,
-      email: map['email'] as String? ?? '', // Default to empty string
+      email: map['email'] as String?, // Default to empty string
     );
   }
 

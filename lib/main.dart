@@ -18,5 +18,3 @@ void main() async {
 
   runApp(ProviderScope(child: MyApp()));
 }
-
-// Todo : Implement the Set User name screen after verfication

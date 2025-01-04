@@ -21,7 +21,7 @@ class AppUser {
   bool get isEmailVerified => _authUser.isEmailVerified;
 
   /// Returns the user's display name.
-  String get userName => _userMeta.userName;
+  String? get userName => _userMeta.userName;
 
   /// Returns the user's bio.
   String? get bio => _userMeta.bio;
