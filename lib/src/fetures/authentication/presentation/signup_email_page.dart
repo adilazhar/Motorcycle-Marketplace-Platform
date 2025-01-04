@@ -17,7 +17,6 @@ class SignupEmailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -33,7 +32,6 @@ class SignupEmailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: kToolbarHeight + 20),
             const Text(
               'Create Account with Email',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

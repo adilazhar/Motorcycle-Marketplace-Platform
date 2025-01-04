@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_final_fields
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -34,7 +32,6 @@ class SignupPasswordPageState extends State<SignupPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -52,7 +49,6 @@ class SignupPasswordPageState extends State<SignupPasswordPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: kToolbarHeight + 20),
               const Text(
                 'Create a Password',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
