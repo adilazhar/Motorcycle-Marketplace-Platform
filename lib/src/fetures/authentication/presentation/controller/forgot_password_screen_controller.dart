@@ -2,24 +2,22 @@ import 'package:bike_listing/src/fetures/authentication/application/app_user_ser
 import 'package:bike_listing/src/routing/app_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'login_screen_controller.g.dart';
+part 'forgot_password_screen_controller.g.dart';
 
 @riverpod
-class LoginScreenController extends _$LoginScreenController {
+class ForgotPasswordScreenController extends _$ForgotPasswordScreenController {
   @override
   FutureOr<void> build() {}
 
-  void login(String email, String password) async {
+  void sendResetPassEmail(String email) async {
     state = AsyncLoading();
     state = await AsyncValue.guard(
-      () => ref
-          .read(appUserServiceProvider)
-          .signInWithEmailAndPassword(email, password),
+      () => ref.read(appUserServiceProvider).sendResetPasswordEmail(email),
     );
 
     if (!state.hasError) {
       final goRouter = ref.read(appRouterProvider);
-      goRouter.go('/');
+      goRouter.go('/forgot_password/email_sent');
     }
   }
 }

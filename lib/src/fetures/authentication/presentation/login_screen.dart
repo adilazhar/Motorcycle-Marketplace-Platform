@@ -115,7 +115,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 10),
               TextButton(
-                onPressed: state.isLoading ? null : () {},
+                onPressed: state.isLoading
+                    ? null
+                    : () => context.go('/forgot_password'),
                 child: const Text('Forgot your password?'),
               ),
               const SizedBox(height: 20),

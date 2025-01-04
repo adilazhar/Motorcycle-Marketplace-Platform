@@ -12,9 +12,11 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // TODO: Set This IP Before running
-  String host = '192.168.1.137';
+  String host = '192.168.1.128';
   await FirebaseStorage.instance.useStorageEmulator(host, 9199);
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
 
   runApp(ProviderScope(child: MyApp()));
 }
+
+// Todo : Implement the Set User name screen after verfication

@@ -1,6 +1,8 @@
 import 'package:bike_listing/src/fetures/authentication/data/auth_user_repository.dart';
+import 'package:bike_listing/src/fetures/authentication/presentation/controller/forgot_password_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/login_screen.dart';
 import 'package:bike_listing/home_screen.dart';
+import 'package:bike_listing/src/fetures/authentication/presentation/password_reset_email_sent_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/signup_screen.dart';
 import 'package:bike_listing/src/providers/firebase_auth.dart';
 import 'package:bike_listing/src/routing/go_router_refresh_stream.dart';
@@ -11,8 +13,6 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
-
-// TODO : Modify the Signup Page To Open the Verification Page direclty
 
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
@@ -47,10 +47,10 @@ GoRouter appRouter(Ref ref) {
     debugLogDiagnostics: true,
     initialLocation: '/login',
     redirect: (context, state) {
-      final currentRoute = state.uri.path;
+      // final currentRoute = state.uri.path;
       final isGoingToLogin = state.uri.path == '/login';
       final isGoingToSignup = state.uri.path == '/signup';
-      final isGoingToHome = state.uri.path == '/';
+      // final isGoingToHome = state.uri.path == '/';
       final isLoggedIn = auth.currentUser != null;
       final isEmailVerified =
           ref.read(authUserRepositoryProvider).currentUser?.isEmailVerified ??
@@ -88,6 +88,20 @@ GoRouter appRouter(Ref ref) {
         path: '/signup',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
             context: context, state: state, child: SignupScreen()),
+      ),
+      GoRoute(
+        path: '/forgot_password',
+        pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context, state: state, child: ForgotPasswordScreen()),
+        routes: [
+          GoRoute(
+            path: 'email_sent',
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: PasswordResetEmailSentScreen()),
+          ),
+        ],
       ),
     ],
   );

@@ -4,6 +4,7 @@ import 'package:bike_listing/src/fetures/authentication/domain/app_user.dart';
 import 'package:bike_listing/src/fetures/authentication/domain/user_meta.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'app_user_service.g.dart';
 
@@ -66,15 +67,28 @@ class AppUserService {
     await ref
         .read(authUserRepositoryProvider)
         .createUserWithEmailAndPassword(email, password);
-  }
 
-  Future<void> createUserMeta(String name) async {
     final currentUser = ref.read(authUserRepositoryProvider).currentUser!;
+    final name = 'User $dummyName';
     final userMeta = UserMeta.fromInput(name, currentUser.email!);
     await ref
         .read(userMetaRepositoryProvider)
         .createUserMeta(userMeta, currentUser.uid);
   }
+
+  // Creates a random user name
+  String get dummyName {
+    final uuid = Uuid();
+    return uuid.v4().substring(0, 4);
+  }
+
+  // Future<void> createUserMeta(String name) async {
+  //   final currentUser = ref.read(authUserRepositoryProvider).currentUser!;
+  //   final userMeta = UserMeta.fromInput(name, currentUser.email!);
+  //   await ref
+  //       .read(userMetaRepositoryProvider)
+  //       .createUserMeta(userMeta, currentUser.uid);
+  // }
 
   /// Signs out the user using [AuthUserRepository].
   Future<void> signOut() async {
