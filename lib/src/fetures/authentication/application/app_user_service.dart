@@ -72,7 +72,7 @@ class AppUserService {
 
     final currentUser = ref.read(authUserRepositoryProvider).currentUser!;
     final name = 'User $dummyName';
-    final userMeta = UserMeta.fromInput(name, currentUser.email!);
+    final userMeta = UserMeta.fromInput(name, email);
     await ref
         .read(userMetaRepositoryProvider)
         .createUserMeta(userMeta, currentUser.uid);
@@ -83,14 +83,6 @@ class AppUserService {
     final uuid = Uuid();
     return uuid.v4().substring(0, 4);
   }
-
-  // Future<void> createUserMeta(String name) async {
-  //   final currentUser = ref.read(authUserRepositoryProvider).currentUser!;
-  //   final userMeta = UserMeta.fromInput(name, currentUser.email!);
-  //   await ref
-  //       .read(userMetaRepositoryProvider)
-  //       .createUserMeta(userMeta, currentUser.uid);
-  // }
 
   /// Signs out the user using [AuthUserRepository].
   Future<void> signOut() async {

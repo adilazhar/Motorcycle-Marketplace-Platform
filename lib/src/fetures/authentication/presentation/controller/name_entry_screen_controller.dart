@@ -11,7 +11,9 @@ class NameEntryScreenController extends _$NameEntryScreenController {
   FutureOr<void> build() {}
 
   void updateName(String name) async {
-    final userMeta = UserMeta(userName: name);
+    final currentUserMeta =
+        ref.read(watchAppUserProvider).requireValue!.userMeta;
+    final userMeta = currentUserMeta.copyWith(userName: name);
 
     state = AsyncLoading();
 

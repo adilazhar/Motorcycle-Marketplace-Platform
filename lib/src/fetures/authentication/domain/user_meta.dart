@@ -28,7 +28,9 @@ class UserMeta {
     return {
       'userName': userName,
       'bio': bio,
-      'joinDate': FieldValue.serverTimestamp(),
+      'joinDate': joinDate == null
+          ? FieldValue.serverTimestamp()
+          : Timestamp.fromDate(joinDate!),
       'email': email,
     };
   }
@@ -36,12 +38,12 @@ class UserMeta {
   /// Creates an instance from a `Map<String, dynamic>`.
   factory UserMeta.fromMap(Map<String, dynamic> map) {
     return UserMeta(
-      userName: map['userName'] as String?, // Default to empty string
+      userName: map['userName'] as String?,
       bio: map['bio'] as String?,
       joinDate: map['joinDate'] != null
           ? (map['joinDate'] as Timestamp).toDate()
           : null,
-      email: map['email'] as String?, // Default to empty string
+      email: map['email'] as String?,
     );
   }
 

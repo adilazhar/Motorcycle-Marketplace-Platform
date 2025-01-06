@@ -11,6 +11,9 @@ class AppUser {
   final AuthUser _authUser;
   final UserMeta _userMeta;
 
+  /// Returns the user's userMeta
+  UserMeta get userMeta => _userMeta;
+
   /// Returns the user's UID.
   String get uid => _authUser.uid;
 

@@ -1,4 +1,5 @@
 import 'package:bike_listing/src/fetures/authentication/application/app_user_service.dart';
+import 'package:bike_listing/src/fetures/authentication/presentation/profile_update_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,12 +38,25 @@ class AccountScreen extends ConsumerWidget {
                 user?.userName ?? 'Name',
                 style: TextStyle(fontSize: 18),
               ),
-              TextButton(onPressed: () {}, child: Text('View Profile')),
+              TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => ProfileUpdateDialog(),
+                    );
+                  },
+                  child: Text(
+                    'View Profile',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  )),
               SizedBox(height: 20),
               ListTile(
                 leading: Icon(Icons.delete),
                 title: Text('Delete Account'),
                 onTap: () async {
+                  // TODO : fix the issue that firebase needs reauthentication before deleting
                   await ref.read(appUserServiceProvider).deleteUser();
                   if (context.mounted) {
                     context.go('/login');
