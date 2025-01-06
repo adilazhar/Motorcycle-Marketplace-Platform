@@ -1,3 +1,4 @@
+import 'package:bike_listing/src/fetures/authentication/application/app_user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,10 +11,7 @@ import 'package:bike_listing/src/utils/async_value_ui.dart';
 class NameEntryScreen extends ConsumerStatefulWidget {
   const NameEntryScreen({
     super.key,
-    required this.userName,
   });
-
-  final String userName;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -63,7 +61,7 @@ class _NameEntryScreenState extends ConsumerState<NameEntryScreen> {
             ),
             SizedBox(height: 16),
             Text(
-              'Your name is set to: ${widget.userName}',
+              'Your name is set to: ${ref.read(watchAppUserProvider).requireValue!.userName}',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16),

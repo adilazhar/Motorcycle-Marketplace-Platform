@@ -40,10 +40,7 @@ class SignupScreenController extends _$SignupScreenController {
           state = AsyncData(currentState.copyWith(isEmailVerified: true));
           timer.cancel();
 
-          final userName =
-              ref.read(watchAppUserProvider).requireValue!.userName;
-
-          ref.read(appRouterProvider).go('/name_entry/$userName');
+          ref.read(appRouterProvider).go('/name_entry');
         }
       },
     );

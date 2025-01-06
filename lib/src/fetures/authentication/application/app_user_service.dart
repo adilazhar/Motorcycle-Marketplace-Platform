@@ -5,6 +5,7 @@ import 'package:bike_listing/src/fetures/authentication/domain/user_meta.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'app_user_service.g.dart';
 
@@ -18,13 +19,14 @@ class AppUserService {
     final authUserStream =
         ref.read(authUserRepositoryProvider).authStateChanges();
 
-    return authUserStream.asyncMap((authUser) async {
-      if (authUser == null) return null;
-      final userMeta = await ref
+    return authUserStream.switchMap((authUser) {
+      if (authUser == null) return Stream.value(null);
+
+      return ref
           .watch(userMetaRepositoryProvider)
           .watchUserMeta(authUser.uid)
-          .first;
-      return AppUser(authUser, userMeta!);
+          .where((userMeta) => userMeta != null)
+          .map((userMeta) => AppUser(authUser, userMeta!));
     });
   }
 

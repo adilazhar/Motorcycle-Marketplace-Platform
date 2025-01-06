@@ -1,4 +1,5 @@
 import 'package:bike_listing/src/fetures/authentication/data/auth_user_repository.dart';
+import 'package:bike_listing/src/fetures/authentication/presentation/account_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/controller/forgot_password_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/login_screen.dart';
 import 'package:bike_listing/home_screen.dart';
@@ -81,6 +82,11 @@ GoRouter appRouter(Ref ref) {
             context: context, state: state, child: HomeScreen()),
       ),
       GoRoute(
+        path: '/account',
+        pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context, state: state, child: AccountScreen()),
+      ),
+      GoRoute(
         path: '/login',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
             context: context, state: state, child: LoginScreen()),
@@ -91,14 +97,9 @@ GoRouter appRouter(Ref ref) {
             context: context, state: state, child: SignupScreen()),
       ),
       GoRoute(
-        path: '/name_entry/:name',
-        pageBuilder: (context, state) {
-          final String name = state.pathParameters['name']!;
-          return buildPageWithDefaultTransition(
-              context: context,
-              state: state,
-              child: NameEntryScreen(userName: name));
-        },
+        path: '/name_entry',
+        pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context, state: state, child: NameEntryScreen()),
       ),
       GoRoute(
         path: '/forgot_password',

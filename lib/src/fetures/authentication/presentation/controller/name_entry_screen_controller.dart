@@ -20,7 +20,7 @@ class NameEntryScreenController extends _$NameEntryScreenController {
     );
 
     if (!state.hasError) {
-      ref.read(appRouterProvider).go('/');
+      ref.read(appRouterProvider).go('/account');
     }
   }
 }
