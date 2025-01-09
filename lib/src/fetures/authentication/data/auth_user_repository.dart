@@ -45,13 +45,32 @@ class AuthUserRepository {
   }
 
   /// Deletes the current user’s account.
-  Future<void> deleteUser() async {
+  Future<void> deleteUser(String email, String password) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    // Re-authenticate the user
+    await reauthenticate(email, password);
+
     await _auth.currentUser?.delete();
   }
 
   /// Reloads the current user’s account.
   Future<void> reloadUser() async {
     await _auth.currentUser?.reload();
+  }
+
+  /// Re-authenticates the user with their email and password.
+  Future<void> reauthenticate(String email, String password) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    // Create a credential with the user's email and password
+    final credential =
+        EmailAuthProvider.credential(email: email, password: password);
+
+    // Re-authenticate the user
+    await user.reauthenticateWithCredential(credential);
   }
 }
 

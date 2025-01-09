@@ -49,10 +49,11 @@ class AppUserService {
   }
 
   /// Deletes the user’s account using [AuthUserRepository] and [UserMetaRepository].
-  Future<void> deleteUser() async {
+  Future<void> deleteUser(String email, String password) async {
     final authUser = ref.read(authUserRepositoryProvider).currentUser;
     if (authUser == null) return;
-    await ref.read(authUserRepositoryProvider).deleteUser();
+
+    await ref.read(authUserRepositoryProvider).deleteUser(email, password);
     await ref.read(userMetaRepositoryProvider).deleteUserMeta(authUser.uid);
   }
 

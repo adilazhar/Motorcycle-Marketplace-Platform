@@ -1,5 +1,4 @@
 import 'package:bike_listing/src/fetures/authentication/application/app_user_service.dart';
-import 'package:bike_listing/src/fetures/authentication/domain/user_meta.dart';
 import 'package:bike_listing/src/routing/app_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

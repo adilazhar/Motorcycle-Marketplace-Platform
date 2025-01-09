@@ -56,11 +56,18 @@ class AccountScreen extends ConsumerWidget {
                 leading: Icon(Icons.delete),
                 title: Text('Delete Account'),
                 onTap: () async {
-                  // TODO : fix the issue that firebase needs reauthentication before deleting
-                  await ref.read(appUserServiceProvider).deleteUser();
-                  if (context.mounted) {
-                    context.go('/login');
-                  }
+                  // Show a dialog to prompt for email and password
+                  final emailController = TextEditingController();
+                  final passwordController = TextEditingController();
+
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ReauthenticationDialog(
+                          emailController: emailController,
+                          passwordController: passwordController);
+                    },
+                  );
                 },
               ),
               ListTile(
@@ -83,6 +90,60 @@ class AccountScreen extends ConsumerWidget {
       loading: () => Center(
         child: CircularProgressIndicator(),
       ),
+    );
+  }
+}
+
+class ReauthenticationDialog extends ConsumerWidget {
+  const ReauthenticationDialog({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+  });
+
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return AlertDialog(
+      title: Text('Re-authenticate'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: emailController,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+          TextField(
+            controller: passwordController,
+            decoration: InputDecoration(labelText: 'Password'),
+            obscureText: true,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            final email = emailController.text.trim();
+            final password = passwordController.text.trim();
+
+            if (email.isNotEmpty && password.isNotEmpty) {
+              await ref
+                  .read(appUserServiceProvider)
+                  .deleteUser(email, password);
+              if (context.mounted) {
+                context.go('/login');
+              }
+            }
+          },
+          child: Text('Delete'),
+        ),
+      ],
     );
   }
 }
