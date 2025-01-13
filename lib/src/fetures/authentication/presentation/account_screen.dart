@@ -15,11 +15,8 @@ class AccountScreen extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          automaticallyImplyLeading: false,
           title: Text('Account'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {},
-          ),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),

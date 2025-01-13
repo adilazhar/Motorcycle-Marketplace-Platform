@@ -1,3 +1,4 @@
+import 'package:bike_listing/scaffold_with_nav_bar.dart';
 import 'package:bike_listing/src/fetures/authentication/data/auth_user_repository.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/account_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/controller/forgot_password_screen.dart';
@@ -45,6 +46,7 @@ GoRouter appRouter(Ref ref) {
   }
 
   final auth = ref.watch(firebaseAuthProvider);
+  // ref.read(watchAppUserProvider);
   return GoRouter(
     debugLogDiagnostics: true,
     initialLocation: '/login',
@@ -76,11 +78,52 @@ GoRouter appRouter(Ref ref) {
     refreshListenable: GoRouterRefreshStream(auth.authStateChanges()),
     errorBuilder: (context, state) => const NotFoundScreen(),
     routes: [
-      GoRoute(
-        path: '/',
-        pageBuilder: (context, state) => buildPageWithDefaultTransition(
-            context: context, state: state, child: HomeScreen()),
+      ShellRoute(
+        builder: (context, state, child) {
+          return ScaffoldWithNavBar(child: child);
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context, state: state, child: HomeScreen()),
+          ),
+          GoRoute(
+              path: '/wishlist',
+              pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                  context: context,
+                  state: state,
+                  child: Scaffold(body: Center(child: Text('Wishlist'))))),
+          GoRoute(
+            path: '/my_ads',
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                context: context,
+                state: state,
+                child: Scaffold(body: Center(child: Text('My Ads')))),
+          ),
+          GoRoute(
+            path: '/account',
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: AccountScreen(),
+            ),
+          ),
+        ],
       ),
+      GoRoute(
+          path: '/sell',
+          pageBuilder: (context, state) => MaterialPage(
+                fullscreenDialog: true,
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text('Sell'),
+                  ),
+                  body: Center(
+                    child: Text('Sell'),
+                  ),
+                ),
+              )),
       GoRoute(
         path: '/account',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(

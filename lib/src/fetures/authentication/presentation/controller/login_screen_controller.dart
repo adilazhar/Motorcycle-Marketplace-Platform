@@ -19,7 +19,7 @@ class LoginScreenController extends _$LoginScreenController {
 
     if (!state.hasError) {
       final goRouter = ref.read(appRouterProvider);
-      goRouter.go('/account');
+      goRouter.go('/');
     }
   }
 }
