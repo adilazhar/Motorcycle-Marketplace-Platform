@@ -15,7 +15,7 @@ abstract class ListingRepository {
 
   Stream<Listing> watchListingById(String id);
 
-  // Todo: Fetch And Watch Listing For A User by id
-  // Future<List<Listing>> fetchListingsForUser(String uid);
-  // Stream<List<Listing>> watchListingsForUser(String uid);
+  Future<List<Listing>> fetchListingsByUserId(String userId);
+
+  Stream<List<Listing>> watchListingsByUserId(String userId);
 }
