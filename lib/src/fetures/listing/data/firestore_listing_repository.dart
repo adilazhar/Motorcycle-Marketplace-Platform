@@ -1,8 +1,13 @@
 import 'package:bike_listing/src/fetures/listing/data/listing_repository.dart';
+import 'package:bike_listing/src/providers/firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'firestore_listing_repository.g.dart';
 
 // Todo: Add Security Roles
 class FirestoreListingRepository implements ListingRepository {
@@ -135,4 +140,10 @@ class FirestoreListingRepository implements ListingRepository {
             .map((doc) => Listing.fromMap(doc.id, doc.data()))
             .toList());
   }
+}
+
+@Riverpod(keepAlive: true)
+ListingRepository listingRepository(Ref ref) {
+  final firestore = ref.read(firestoreProvider);
+  return FirestoreListingRepository(firestore);
 }

@@ -1,10 +1,15 @@
 import 'dart:io';
 import 'package:bike_listing/src/fetures/listing/data/image_repository.dart';
+import 'package:bike_listing/src/providers/firebase_storage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+
+part 'firebase_storage_image_repository.g.dart';
 
 class FirebaseStorageImageRepository implements ImageRepository {
   final FirebaseStorage _storage;
@@ -97,4 +102,10 @@ class FirebaseStorageImageRepository implements ImageRepository {
       return null;
     }
   }
+}
+
+@Riverpod(keepAlive: true)
+ImageRepository imageRepository(Ref ref) {
+  final storage = ref.read(firebaseStorageProvider);
+  return FirebaseStorageImageRepository(storage);
 }
