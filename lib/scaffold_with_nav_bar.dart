@@ -70,7 +70,9 @@ class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          context.push('/sell');
+        },
         backgroundColor: Colors.white,
         child: const Icon(
           CupertinoIcons.add,

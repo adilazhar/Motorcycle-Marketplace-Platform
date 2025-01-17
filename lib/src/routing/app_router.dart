@@ -7,6 +7,7 @@ import 'package:bike_listing/home_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/name_entry_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/password_reset_email_sent_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/signup_screen.dart';
+import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
 import 'package:bike_listing/src/providers/firebase_auth.dart';
 import 'package:bike_listing/src/routing/go_router_refresh_stream.dart';
 import 'package:bike_listing/src/routing/not_found_screen.dart';
@@ -30,6 +31,31 @@ GoRouter appRouter(Ref ref) {
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         // Define slide animation
         const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+
+  CustomTransitionPage buildPageWithBottomUpTransition({
+    required BuildContext context,
+    required GoRouterState state,
+    required Widget child,
+  }) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0); // Start from bottom
         const end = Offset.zero;
         const curve = Curves.easeInOut;
 
@@ -112,18 +138,15 @@ GoRouter appRouter(Ref ref) {
         ],
       ),
       GoRoute(
-          path: '/sell',
-          pageBuilder: (context, state) => MaterialPage(
-                fullscreenDialog: true,
-                child: Scaffold(
-                  appBar: AppBar(
-                    title: Text('Sell'),
-                  ),
-                  body: Center(
-                    child: Text('Sell'),
-                  ),
-                ),
-              )),
+        path: '/sell',
+        pageBuilder: (context, state) {
+          return buildPageWithBottomUpTransition(
+            context: context,
+            state: state,
+            child: AddListingScreen(),
+          );
+        },
+      ),
       GoRoute(
         path: '/account',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
