@@ -1,7 +1,13 @@
 import 'dart:io';
 
+import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddListingScreen extends StatefulWidget {
@@ -14,6 +20,105 @@ class AddListingScreen extends StatefulWidget {
 class _AddListingScreenState extends State<AddListingScreen> {
   final ImagePicker _picker = ImagePicker();
   List<File> selectedImages = [];
+
+  final _formKey = GlobalKey<FormBuilderState>();
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _locationController;
+  BikeBrand? _selectedBrand;
+  String _selectedModel = '';
+  int currentYear = DateTime.now().year;
+  EngineCapacity? _selectedEngineCapacity;
+  RegistrationCity? _selectedRegistrationCity;
+  GeoPoint? _coordinates;
+  String _location = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _locationController = TextEditingController(text: 'Tap to Get Location');
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectEnumValue<T extends Enum>({
+    required String title,
+    required List<T> options,
+    required Function(T) onSelected,
+  }) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+            leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          body: ListView.builder(
+            itemCount: options.length,
+            itemBuilder: (context, index) {
+              final option = options[index];
+              return ListTile(
+                title: Text(option.name),
+                onTap: () {
+                  onSelected(option);
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _selectModel({
+    required List<String> models,
+    required Function(String) onSelected,
+  }) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Choose Model'),
+            leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          body: ListView.builder(
+            itemCount: models.length,
+            itemBuilder: (context, index) {
+              final model = models[index];
+              return ListTile(
+                title: Text(model),
+                onTap: () {
+                  onSelected(model);
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> _pickImages() async {
     final List<XFile> pickedFile = await _picker.pickMultiImage();
@@ -63,6 +168,77 @@ class _AddListingScreenState extends State<AddListingScreen> {
     );
   }
 
+  Future<void> _getCurrentLocation() async {
+    try {
+      // Show loading state
+      _locationController.text = 'Getting location...';
+
+      // Request location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          _locationController.text = 'Tap to Get Location';
+          throw Exception('Location permission denied');
+        }
+      }
+
+      // Get location with lower accuracy
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings:
+            AndroidSettings(accuracy: LocationAccuracy.bestForNavigation),
+      );
+
+      _coordinates = GeoPoint(position.latitude, position.longitude);
+
+      // Get address from coordinates with less detail
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        // Build address components
+        List<String> addressParts = [];
+
+        if (place.subLocality?.isNotEmpty == true) {
+          addressParts.add(place.subLocality!);
+        }
+        if (place.locality?.isNotEmpty == true) {
+          addressParts.add(place.locality!);
+        }
+        if (place.subAdministrativeArea?.isNotEmpty == true &&
+            place.subAdministrativeArea != place.locality) {
+          addressParts.add(place.subAdministrativeArea!);
+        }
+        if (place.administrativeArea?.isNotEmpty == true) {
+          addressParts.add(place.administrativeArea!);
+        }
+
+        // Filter out any plus codes (they usually contain '+' character)
+        addressParts =
+            addressParts.where((part) => !part.contains('+')).toList();
+
+        // Join with commas
+        final address = addressParts.join(', ');
+
+        setState(() {
+          _location = address;
+          _locationController.text = address;
+        });
+      }
+    } catch (e) {
+      _locationController.text = 'Tap to Get Location';
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error getting location: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,96 +248,454 @@ class _AddListingScreenState extends State<AddListingScreen> {
             icon: Icon(CupertinoIcons.xmark)),
         title: Text('Ad Details'),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 1.0),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: selectedImages.isEmpty
-                  ? Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Icon(Icons.photo_library, size: 48.0),
-                          ElevatedButton(
-                            onPressed: _pickImages,
-                            child: Text('Add Images'),
-                          ),
-                          SizedBox(
-                            height: 8.0,
-                            width: double.infinity,
-                          ),
-                          Text('Select All the images of the bike'),
-                        ],
-                      ),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+      body: SingleChildScrollView(
+        child: FormBuilder(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Images Picker
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1.0),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: selectedImages.isEmpty
+                      ? Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Column(
                             children: [
-                              Container(
-                                height: 100,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.black, width: 1.0),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: IconButton(
-                                  icon: Icon(Icons.add),
-                                  onPressed: _pickImages,
-                                ),
+                              Icon(Icons.photo_library, size: 48.0),
+                              ElevatedButton(
+                                onPressed: _pickImages,
+                                child: Text('Add Images'),
                               ),
                               SizedBox(
-                                width: 10,
+                                height: 8.0,
+                                width: double.infinity,
                               ),
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: selectedImages.map((image) {
-                                      int index = selectedImages.indexOf(image);
-                                      return Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 5),
-                                        child: GestureDetector(
-                                          onTap: () => _showEditOptions(index),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: SizedBox(
-                                              height: 100,
-                                              width: 100,
-                                              child: Image.file(
-                                                image,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
+                              Text('Select All the images of the bike'),
                             ],
                           ),
-                          SizedBox(
-                            height: 10,
+                        )
+                      : Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 100,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.black, width: 1.0),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: IconButton(
+                                      icon: Icon(Icons.add),
+                                      onPressed: _pickImages,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: selectedImages.map((image) {
+                                          int index =
+                                              selectedImages.indexOf(image);
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5),
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  _showEditOptions(index),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: SizedBox(
+                                                  height: 100,
+                                                  width: 100,
+                                                  child: Image.file(
+                                                    image,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text('Tap on images to edit them.'),
+                            ],
                           ),
-                          Text('Tap on images to edit them.'),
-                        ],
+                        ),
+                ),
+
+                SizedBox(
+                  height: 10,
+                ),
+
+                // Brand Field
+                Text('Brand *'),
+                FormBuilderField(
+                  name: 'brand',
+                  validator: FormBuilderValidators.required(
+                      errorText: 'Please select a brand'),
+                  builder: (field) {
+                    return GestureDetector(
+                      onTap: () {
+                        _selectEnumValue(
+                          title: 'Choose Brand',
+                          options: BikeBrand.values,
+                          onSelected: (BikeBrand brand) {
+                            setState(() {
+                              _selectedBrand = brand;
+                            });
+                            _formKey.currentState?.fields['brand']
+                                ?.didChange(brand.name);
+                          },
+                        );
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                              borderRadius: BorderRadius.circular(8)),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_selectedBrand != null
+                                ? _selectedBrand!.name
+                                : 'Choose'),
+                            Icon(Icons.keyboard_arrow_right_rounded),
+                          ],
+                        ),
                       ),
+                    );
+                  },
+                ),
+
+                // Model Field
+                Text('Model'),
+                FormBuilderField(
+                  name: 'model',
+                  validator: FormBuilderValidators.required(
+                      errorText: 'Please select a model'),
+                  builder: (field) {
+                    return GestureDetector(
+                      onTap: () {
+                        if (_selectedBrand == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Please select a brand first')),
+                          );
+                          return;
+                        }
+                        _selectModel(
+                          models: BikeModels.getModelsForBrand(_selectedBrand!),
+                          onSelected: (String model) {
+                            setState(() {
+                              _selectedModel = model;
+                            });
+                            _formKey.currentState?.fields['model']
+                                ?.didChange(model);
+                          },
+                        );
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_selectedModel.isNotEmpty
+                                ? _selectedModel
+                                : 'Choose Model'),
+                            Icon(Icons.keyboard_arrow_right_rounded),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  enabled: _selectedBrand != null,
+                ),
+
+                // Year Field
+                Text('Year *'),
+                FormBuilderTextField(
+                  name: 'year',
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: 'Year is required'),
+                    FormBuilderValidators.integer(
+                        errorText: 'Please enter a valid year'),
+                    FormBuilderValidators.min(1900,
+                        errorText: 'Year must be 1900 or later'),
+                    FormBuilderValidators.max(currentYear + 1,
+                        errorText: 'Invalid future year'),
+                    (value) {
+                      if (value == null || value.isEmpty) return null;
+                      if (value.length != 4) return 'Year must be 4 digits';
+                      return null;
+                    },
+                  ]),
+                  keyboardType: TextInputType.number,
+                ),
+
+                // Engine Capacity Field
+                Text('Engine Capacity'),
+                FormBuilderField(
+                  name: 'engineCapacity',
+                  validator: FormBuilderValidators.required(
+                      errorText: 'Please select engine capacity'),
+                  builder: (field) {
+                    return GestureDetector(
+                      onTap: () {
+                        _selectEnumValue(
+                          title: 'Choose Engine Capacity',
+                          options: EngineCapacity.values,
+                          onSelected: (EngineCapacity capacity) {
+                            setState(() {
+                              _selectedEngineCapacity = capacity;
+                            });
+                            _formKey.currentState?.fields['engineCapacity']
+                                ?.didChange(capacity.name);
+                          },
+                        );
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_selectedEngineCapacity != null
+                                ? _selectedEngineCapacity!.name
+                                : 'Choose'),
+                            Icon(Icons.keyboard_arrow_right_rounded),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                // Mileage
+                Text('KM\'s Driven'),
+                FormBuilderTextField(
+                  name: 'mileage',
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: 'Mileage is required'),
+                    FormBuilderValidators.numeric(
+                        errorText: 'Please enter a valid number'),
+                    FormBuilderValidators.min(0,
+                        errorText: 'Mileage cannot be negative'),
+                  ]),
+                  keyboardType: TextInputType.number,
+                ),
+
+                // Ignition Type Field
+                Text('Ignition Type'),
+                FormBuilderChoiceChip(
+                  name: 'isSelfStart',
+                  validator: FormBuilderValidators.required(
+                      errorText: 'Please select ignition type'),
+                  decoration: InputDecoration.collapsed(hintText: ''),
+                  options: [
+                    FormBuilderChipOption(
+                      value: true,
+                      child: Text('Self Start'),
                     ),
+                    FormBuilderChipOption(
+                      value: false,
+                      child: Text('Kick Start'),
+                    ),
+                  ],
+                ),
+
+                // Condition Field
+                Text('Condition *'),
+                FormBuilderChoiceChip(
+                  name: 'condition',
+                  decoration: InputDecoration.collapsed(hintText: ''),
+                  options: [
+                    FormBuilderChipOption(
+                      value: true,
+                      child: Text('New'),
+                    ),
+                    FormBuilderChipOption(
+                      value: false,
+                      child: Text('Used'),
+                    ),
+                  ],
+                  validator: FormBuilderValidators.required(
+                      errorText: 'Please select condition'),
+                ),
+
+                // Registration City Field
+                Text('Registration City'),
+                FormBuilderField(
+                  name: 'registrationCity',
+                  validator: FormBuilderValidators.required(
+                      errorText: 'Please select registration city'),
+                  builder: (field) {
+                    return GestureDetector(
+                      onTap: () {
+                        _selectEnumValue(
+                          title: 'Choose Registration City',
+                          options: RegistrationCity.values,
+                          onSelected: (RegistrationCity city) {
+                            setState(() {
+                              _selectedRegistrationCity = city;
+                            });
+                            _formKey.currentState?.fields['registrationCity']
+                                ?.didChange(city.name);
+                          },
+                        );
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_selectedRegistrationCity != null
+                                ? _selectedRegistrationCity!.name
+                                : 'Choose'),
+                            Icon(Icons.keyboard_arrow_right_rounded),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                Divider(),
+
+                // Title Field
+                Text('Ad Title *'),
+                FormBuilderTextField(
+                  controller: _titleController,
+                  name: 'title',
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: 'Title is required'),
+                    FormBuilderValidators.minLength(10,
+                        errorText: 'Title must be at least 10 characters'),
+                    FormBuilderValidators.maxLength(100,
+                        errorText: 'Title cannot exceed 100 characters'),
+                  ]),
+                ),
+
+                // Description Field
+                Text('Description *'),
+                FormBuilderTextField(
+                  controller: _descriptionController,
+                  name: 'description',
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Describe the item you are selling'),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: 'Description is required'),
+                    FormBuilderValidators.minLength(30,
+                        errorText:
+                            'Description must be at least 30 characters'),
+                    FormBuilderValidators.maxLength(1000,
+                        errorText: 'Description cannot exceed 1000 characters'),
+                  ]),
+                  maxLines: 3,
+                ),
+
+                Text('Location'),
+                FormBuilderTextField(
+                  controller: _locationController,
+                  name: 'location',
+
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: 'Location is required'),
+                    (value) {
+                      if (value == 'Tap to Get Location') {
+                        return 'Please select your location';
+                      }
+                      return null;
+                    },
+                  ]),
+                  readOnly: true,
+                  maxLines: null, // Allows the field to expand
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: _locationController.text == 'Tap to Get Location'
+                        ? Colors.grey
+                        : Colors.black,
+                  ),
+                  onTap: _locationController.text == 'Tap to Get Location'
+                      ? _getCurrentLocation
+                      : null,
+                ),
+
+                Divider(),
+
+                // Price Field
+                Text('Price'),
+                FormBuilderTextField(
+                  name: 'price',
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: 'Price is required'),
+                    FormBuilderValidators.numeric(
+                        errorText: 'Please enter a valid number'),
+                    FormBuilderValidators.min(3000,
+                        errorText: 'Price must be greater than 3000'),
+                    FormBuilderValidators.max(1000000,
+                        errorText: 'Price seems too high'),
+                    (value) {
+                      if (value != null && value.toString().contains('.')) {
+                        return 'Please enter a whole number';
+                      }
+                      return null;
+                    },
+                  ]),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
       persistentFooterButtons: [

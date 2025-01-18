@@ -19,4 +19,15 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
+/////Todo: Make the Homepage animate from left when signing in or after creating new account
 // Todo: Create The Add Listing Page
+// Todo: Implement Proper Validation
+// Todo: Spacing Between the items
+// Todo: Properly Format Enums
+// Todo: Turn Off tick for chips
+// Todo: Reordering of The pictures in the selected images
+// Todo: Save Method
+// Todo: Make the Auth Screens Scrollable to remove overflow error
+// Todo: Delete All User Listings When A User Deletes his Account
+// Todo: Add Search bar to search the Options in the enums selectors
+// Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing

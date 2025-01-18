@@ -394,3 +394,15 @@ class Listing extends Equatable {
     );
   }
 }
+
+String formatEnum(Enum enumValue) {
+  final name = enumValue.name;
+  final spaced = name.replaceAll(RegExp('([A-Z])'), ' \$1').trim();
+  return spaced.split(' ').map((word) => word.capitalize()).join(' ');
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    return isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
