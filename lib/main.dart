@@ -19,7 +19,6 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-// Todo: Fix the Auto Focus On textfield and fix the jumping to that field
-// Todo: Save Method
+// Todo: Create A Controller and add the submit form method
 // Todo: Delete All User Listings When A User Deletes his Account
 // Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing

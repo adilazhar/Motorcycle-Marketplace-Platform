@@ -325,7 +325,7 @@ class Listing extends Equatable {
 
   @override
   String toString() {
-    return 'Listing(id: $id, imageUrls: $imageUrls, title: $title, description: $description, price: $price, year: $year, mileage: $mileage, brand: $brand, model: $model, engineCapacity: $engineCapacity, registrationCity: $registrationCity, isSelfStart: $isSelfStart, isNew: $isNew, coordinates: $coordinates, location: $location, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId)';
+    return 'Listing(id: $id, imageUrls: $imageUrls, title: $title, description: $description, price: $price, year: $year, mileage: $mileage, brand: $brand, model: $model, engineCapacity: $engineCapacity, registrationCity: $registrationCity, isSelfStart: $isSelfStart, isNew: $isNew, coordinates: lat(${coordinates.latitude})long(${coordinates.longitude}), location: $location, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId)';
   }
 
   @override

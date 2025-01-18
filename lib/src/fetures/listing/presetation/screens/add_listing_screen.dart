@@ -50,6 +50,64 @@ class _AddListingScreenState extends State<AddListingScreen> {
     super.dispose();
   }
 
+  void _saveListing() {
+    if (_formKey.currentState?.validate() ?? false) {
+      // First check if images are selected
+      if (selectedImages.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select at least one image')),
+        );
+        return;
+      }
+
+      // Get all form values
+      _formKey.currentState?.save();
+      final formData = _formKey.currentState?.value;
+
+      if (formData == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error getting form data')),
+        );
+        return;
+      }
+
+      // Validate location
+      if (_coordinates == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select your location')),
+        );
+        return;
+      }
+
+      final Listing listing = Listing(
+        id: '',
+        imageUrls: [],
+        brand: _selectedBrand!,
+        model: _selectedModel,
+        year: int.parse(formData['year']),
+        engineCapacity: _selectedEngineCapacity!,
+        mileage: int.parse(formData['mileage']),
+        isSelfStart: formData['isSelfStart'],
+        isNew: formData['condition'],
+        registrationCity: _selectedRegistrationCity!,
+        title: _titleController.text,
+        description: _descriptionController.text,
+        location: _location,
+        coordinates: GeoPoint(_coordinates!.latitude, _coordinates!.longitude),
+        price: int.parse(formData['price']),
+        userId: '',
+      );
+
+      // print(listing.toString());
+      // Todo: Submit The Form
+    } else {
+      // Form validation failed
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all required fields correctly')),
+      );
+    }
+  }
+
   Future<void> _selectEnumValue<T extends Enum>({
     required String title,
     required List<T> options,
@@ -288,7 +346,6 @@ class _AddListingScreenState extends State<AddListingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Images Picker
-                // Images Picker
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 1.0),
@@ -442,7 +499,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 ),
 
                 // Model Field
-                Text('Model'),
+                Text('Model *'),
                 FormBuilderField(
                   name: 'model',
                   validator: FormBuilderValidators.required(
@@ -523,7 +580,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 ),
 
                 // Engine Capacity Field
-                Text('Engine Capacity'),
+                Text('Engine Capacity *'),
                 FormBuilderField(
                   name: 'engineCapacity',
                   validator: FormBuilderValidators.required(
@@ -567,7 +624,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 ),
 
                 // Mileage
-                Text('KM\'s Driven'),
+                Text('KM\'s Driven &'),
                 FormBuilderTextField(
                   name: 'mileage',
                   decoration: InputDecoration(
@@ -591,7 +648,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 ),
 
                 // Ignition Type Field
-                Text('Ignition Type'),
+                Text('Ignition Type *'),
                 FormBuilderChoiceChip(
                   name: 'isSelfStart',
                   showCheckmark: false,
@@ -735,7 +792,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   height: 20,
                 ),
 
-                Text('Location'),
+                Text('Location *'),
                 FormBuilderTextField(
                   controller: _locationController,
                   name: 'location',
@@ -777,7 +834,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 ),
 
                 // Price Field
-                Text('Price'),
+                Text('Price *'),
                 FormBuilderTextField(
                   name: 'price',
                   decoration: InputDecoration(
@@ -814,7 +871,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       persistentFooterButtons: [
         SizedBox(
             width: double.infinity,
-            child: ElevatedButton(onPressed: () {}, child: Text('Submit')))
+            child:
+                ElevatedButton(onPressed: _saveListing, child: Text('Submit')))
       ],
     );
   }
