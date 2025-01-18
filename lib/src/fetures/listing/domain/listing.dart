@@ -397,8 +397,51 @@ class Listing extends Equatable {
 
 String formatEnum(Enum enumValue) {
   final name = enumValue.name;
-  final spaced = name.replaceAll(RegExp('([A-Z])'), ' \$1').trim();
-  return spaced.split(' ').map((word) => word.capitalize()).join(' ');
+  // Split on capital letters but keep them
+  final spaced = name
+      .replaceAllMapped(RegExp('([A-Z])'), (match) => ' ${match.group(1)}')
+      .trim();
+
+  // Only capitalize first word, keep others as they are
+  final words = spaced.split(' ');
+  if (words.isEmpty) return '';
+
+  words[0] = words[0].capitalize();
+  return words.join(' ');
+}
+
+String formatEngineSize(Enum enumValue) {
+  final name = enumValue.name;
+
+  // Handle 'below' case
+  if (name.startsWith('below')) {
+    final number = RegExp(r'\d+').firstMatch(name)?.group(0) ?? '';
+    return 'Below ${number}cc';
+  }
+
+  // Handle 'above' case
+  if (name.startsWith('above')) {
+    final number = RegExp(r'\d+').firstMatch(name)?.group(0) ?? '';
+    return 'Above ${number}cc';
+  }
+
+  // Handle range case (e.g., cc100_149)
+  if (name.contains('_')) {
+    final numbers = name
+        .replaceAll('cc', '')
+        .split('_')
+        .map((n) => n.replaceAll(RegExp(r'[^0-9]'), ''))
+        .toList();
+    return '${numbers[0]}cc-${numbers[1]}cc';
+  }
+
+  // Handle simple cc cases (e.g., cc70, cc1000)
+  if (name.startsWith('cc')) {
+    final number = name.replaceAll('cc', '');
+    return '${number}cc';
+  }
+
+  return name;
 }
 
 extension StringExtension on String {

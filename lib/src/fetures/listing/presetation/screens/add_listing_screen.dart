@@ -53,6 +53,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
     required String title,
     required List<T> options,
     required Function(T) onSelected,
+    bool isEngineCapacity = false,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -67,18 +68,21 @@ class _AddListingScreenState extends State<AddListingScreen> {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          body: ListView.builder(
+          body: ListView.separated(
             itemCount: options.length,
             itemBuilder: (context, index) {
               final option = options[index];
               return ListTile(
-                title: Text(option.name),
+                title: Text(isEngineCapacity
+                    ? formatEngineSize(option)
+                    : formatEnum(option)),
                 onTap: () {
                   onSelected(option);
                   Navigator.pop(context);
                 },
               );
             },
+            separatorBuilder: (BuildContext context, int index) => Divider(),
           ),
         );
       },
@@ -102,7 +106,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          body: ListView.builder(
+          body: ListView.separated(
             itemCount: models.length,
             itemBuilder: (context, index) {
               final model = models[index];
@@ -114,6 +118,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 },
               );
             },
+            separatorBuilder: (BuildContext context, int index) => Divider(),
           ),
         );
       },
@@ -288,8 +293,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    height: 100,
-                                    width: 100,
+                                    height: 60,
+                                    width: 60,
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                           color: Colors.black, width: 1.0),
@@ -306,31 +311,35 @@ class _AddListingScreenState extends State<AddListingScreen> {
                                   Expanded(
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: selectedImages.map((image) {
-                                          int index =
-                                              selectedImages.indexOf(image);
-                                          return Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 5),
-                                            child: GestureDetector(
-                                              onTap: () =>
-                                                  _showEditOptions(index),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                                child: SizedBox(
-                                                  height: 100,
-                                                  width: 100,
-                                                  child: Image.file(
-                                                    image,
-                                                    fit: BoxFit.cover,
+                                      child: SizedBox(
+                                        height: 60,
+                                        child: Row(
+                                          children: selectedImages.map((image) {
+                                            int index =
+                                                selectedImages.indexOf(image);
+                                            return Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 5),
+                                              child: GestureDetector(
+                                                onTap: () =>
+                                                    _showEditOptions(index),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                  child: SizedBox(
+                                                    height: 60,
+                                                    width: 60,
+                                                    child: Image.file(
+                                                      image,
+                                                      fit: BoxFit.cover,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        }).toList(),
+                                            );
+                                          }).toList(),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -346,7 +355,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 ),
 
                 SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
 
                 // Brand Field
@@ -364,6 +373,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                           onSelected: (BikeBrand brand) {
                             setState(() {
                               _selectedBrand = brand;
+                              _selectedModel = '';
                             });
                             _formKey.currentState?.fields['brand']
                                 ?.didChange(brand.name);
@@ -373,22 +383,13 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       child: InputDecorator(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black),
                               borderRadius: BorderRadius.circular(8)),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(_selectedBrand != null
-                                ? _selectedBrand!.name
+                                ? formatEnum(_selectedBrand!)
                                 : 'Choose'),
                             Icon(Icons.keyboard_arrow_right_rounded),
                           ],
@@ -396,6 +397,10 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       ),
                     );
                   },
+                ),
+
+                SizedBox(
+                  height: 20,
                 ),
 
                 // Model Field
@@ -427,7 +432,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       },
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -444,11 +450,18 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   enabled: _selectedBrand != null,
                 ),
 
+                SizedBox(
+                  height: 20,
+                ),
+
                 // Year Field
                 Text('Year *'),
                 FormBuilderTextField(
                   name: 'year',
-                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
                         errorText: 'Year is required'),
@@ -467,6 +480,10 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   keyboardType: TextInputType.number,
                 ),
 
+                SizedBox(
+                  height: 20,
+                ),
+
                 // Engine Capacity Field
                 Text('Engine Capacity'),
                 FormBuilderField(
@@ -479,6 +496,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                         _selectEnumValue(
                           title: 'Choose Engine Capacity',
                           options: EngineCapacity.values,
+                          isEngineCapacity: true,
                           onSelected: (EngineCapacity capacity) {
                             setState(() {
                               _selectedEngineCapacity = capacity;
@@ -490,13 +508,14 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       },
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(_selectedEngineCapacity != null
-                                ? _selectedEngineCapacity!.name
+                                ? formatEngineSize(_selectedEngineCapacity!)
                                 : 'Choose'),
                             Icon(Icons.keyboard_arrow_right_rounded),
                           ],
@@ -505,12 +524,18 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     );
                   },
                 ),
+                SizedBox(
+                  height: 20,
+                ),
 
                 // Mileage
                 Text('KM\'s Driven'),
                 FormBuilderTextField(
                   name: 'mileage',
-                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
                         errorText: 'Mileage is required'),
@@ -518,17 +543,26 @@ class _AddListingScreenState extends State<AddListingScreen> {
                         errorText: 'Please enter a valid number'),
                     FormBuilderValidators.min(0,
                         errorText: 'Mileage cannot be negative'),
+                    FormBuilderValidators.max(999999,
+                        errorText: 'Mileage seems too high'),
                   ]),
                   keyboardType: TextInputType.number,
+                ),
+                SizedBox(
+                  height: 20,
                 ),
 
                 // Ignition Type Field
                 Text('Ignition Type'),
                 FormBuilderChoiceChip(
                   name: 'isSelfStart',
+                  showCheckmark: false,
+                  spacing: 10,
                   validator: FormBuilderValidators.required(
                       errorText: 'Please select ignition type'),
-                  decoration: InputDecoration.collapsed(hintText: ''),
+                  decoration: InputDecoration.collapsed(
+                    hintText: '',
+                  ),
                   options: [
                     FormBuilderChipOption(
                       value: true,
@@ -540,11 +574,16 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     ),
                   ],
                 ),
+                SizedBox(
+                  height: 20,
+                ),
 
                 // Condition Field
                 Text('Condition *'),
                 FormBuilderChoiceChip(
                   name: 'condition',
+                  showCheckmark: false,
+                  spacing: 10,
                   decoration: InputDecoration.collapsed(hintText: ''),
                   options: [
                     FormBuilderChipOption(
@@ -558,6 +597,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   ],
                   validator: FormBuilderValidators.required(
                       errorText: 'Please select condition'),
+                ),
+                SizedBox(
+                  height: 20,
                 ),
 
                 // Registration City Field
@@ -583,13 +625,14 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       },
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(_selectedRegistrationCity != null
-                                ? _selectedRegistrationCity!.name
+                                ? formatEnum(_selectedRegistrationCity!)
                                 : 'Choose'),
                             Icon(Icons.keyboard_arrow_right_rounded),
                           ],
@@ -598,15 +641,25 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     );
                   },
                 ),
+                SizedBox(
+                  height: 20,
+                ),
 
                 Divider(),
+
+                SizedBox(
+                  height: 20,
+                ),
 
                 // Title Field
                 Text('Ad Title *'),
                 FormBuilderTextField(
                   controller: _titleController,
                   name: 'title',
-                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
                         errorText: 'Title is required'),
@@ -616,6 +669,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
                         errorText: 'Title cannot exceed 100 characters'),
                   ]),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
 
                 // Description Field
                 Text('Description *'),
@@ -623,7 +679,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   controller: _descriptionController,
                   name: 'description',
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                       hintText: 'Describe the item you are selling'),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
@@ -636,6 +693,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   ]),
                   maxLines: 3,
                 ),
+                SizedBox(
+                  height: 20,
+                ),
 
                 Text('Location'),
                 FormBuilderTextField(
@@ -643,7 +703,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   name: 'location',
 
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
@@ -667,14 +728,25 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       ? _getCurrentLocation
                       : null,
                 ),
+                SizedBox(
+                  height: 20,
+                ),
 
                 Divider(),
+
+                SizedBox(
+                  height: 20,
+                ),
 
                 // Price Field
                 Text('Price'),
                 FormBuilderTextField(
                   name: 'price',
-                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                    prefixText: 'Rs-',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
                         errorText: 'Price is required'),
@@ -692,6 +764,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     },
                   ]),
                   keyboardType: TextInputType.number,
+                ),
+                SizedBox(
+                  height: 10,
                 ),
               ],
             ),
