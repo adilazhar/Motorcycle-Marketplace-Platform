@@ -20,7 +20,6 @@ void main() async {
 }
 
 // Todo: Fix the Auto Focus On textfield and fix the jumping to that field
-// Todo: Reordering of The pictures in the selected images
 // Todo: Save Method
 // Todo: Delete All User Listings When A User Deletes his Account
 // Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing

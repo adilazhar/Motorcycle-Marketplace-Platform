@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -244,6 +245,31 @@ class _AddListingScreenState extends State<AddListingScreen> {
     }
   }
 
+  Widget proxyDecor(Widget child, int index, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) {
+        final double animValue = Curves.easeInOut.transform(animation.value);
+        final double scale = lerpDouble(1, 1.02, animValue)!;
+        return Transform.scale(
+          scale: scale,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: SizedBox(
+              height: 60,
+              width: 60,
+              child: Image.file(
+                selectedImages[index],
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -261,6 +287,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Images Picker
                 // Images Picker
                 Container(
                   decoration: BoxDecoration(
@@ -305,50 +332,61 @@ class _AddListingScreenState extends State<AddListingScreen> {
                                       onPressed: _pickImages,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
+                                  SizedBox(width: 10),
                                   Expanded(
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: SizedBox(
-                                        height: 60,
-                                        child: Row(
-                                          children: selectedImages.map((image) {
-                                            int index =
-                                                selectedImages.indexOf(image);
-                                            return Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 5),
-                                              child: GestureDetector(
-                                                onTap: () =>
-                                                    _showEditOptions(index),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child: SizedBox(
-                                                    height: 60,
-                                                    width: 60,
-                                                    child: Image.file(
-                                                      image,
-                                                      fit: BoxFit.cover,
-                                                    ),
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: ReorderableListView(
+                                        scrollDirection: Axis.horizontal,
+                                        proxyDecorator: proxyDecor,
+                                        onReorder: (oldIndex, newIndex) {
+                                          setState(() {
+                                            if (oldIndex < newIndex) {
+                                              newIndex -= 1;
+                                            }
+                                            final File item = selectedImages
+                                                .removeAt(oldIndex);
+                                            selectedImages.insert(
+                                                newIndex, item);
+                                          });
+                                        },
+                                        children: selectedImages
+                                            .asMap()
+                                            .entries
+                                            .map((entry) {
+                                          int index = entry.key;
+                                          File image = entry.value;
+                                          return Padding(
+                                            key: ValueKey(image
+                                                .path), // Unique key for each item
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5),
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  _showEditOptions(index),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: SizedBox(
+                                                  height: 60,
+                                                  width: 60,
+                                                  child: Image.file(
+                                                    image,
+                                                    fit: BoxFit.cover,
                                                   ),
                                                 ),
                                               ),
-                                            );
-                                          }).toList(),
-                                        ),
+                                            ),
+                                          );
+                                        }).toList(),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text('Tap on images to edit them.'),
+                              SizedBox(height: 10),
+                              Text(
+                                  'Hold and drag images to reorder. Tap to edit.'),
                             ],
                           ),
                         ),
