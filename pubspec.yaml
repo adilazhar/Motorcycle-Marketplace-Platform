@@ -56,6 +56,9 @@ dependencies:
   geolocator: ^13.0.2
   geocoding: ^3.0.0
   firebase_ui_firestore: ^1.7.1
+  carousel_slider: ^5.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
   
 
 dev_dependencies:

@@ -1,7 +1,7 @@
 import 'package:bike_listing/src/fetures/listing/data/firestore_listing_repository.dart';
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
+import 'package:bike_listing/src/fetures/listing/presetation/screens/bike_detail_screen.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +17,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   ViewType _viewType = ViewType.list;
-  final formatter = NumberFormat("#,##,###");
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: FirestoreQueryBuilder<Listing>(
           query: ref.read(listingRepositoryProvider).getListingsQuery(),
           builder: (context, snapshot, _) {
@@ -75,7 +74,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       }
                       return BikeGridCard(
                         listing: listing,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => BikeDetailScreen(listing),
+                          ));
+                        },
                         formatter: formatter,
                       );
                     },
@@ -91,7 +94,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return BikeListCard(
                         listing: listing,
                         onTap: () {
-                          // Handle navigation
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => BikeDetailScreen(listing),
+                          ));
                         },
                         formatter: formatter,
                       );
@@ -119,7 +124,9 @@ class BikeGridCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(8)),
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: onTap,
@@ -127,7 +134,7 @@ class BikeGridCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 200,
+              width: 205,
               height: 120,
               child: Image.network(
                 listing.imageUrls[0],
@@ -136,7 +143,7 @@ class BikeGridCard extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(08.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -145,11 +152,10 @@ class BikeGridCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Rs. ${formatter.format(listing.price)}',
+                            listing.formattedPrice,
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green[600],
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -158,12 +164,10 @@ class BikeGridCard extends StatelessWidget {
                         IconButton(
                           icon: const Icon(
                             Icons.favorite_border,
-                            color: Colors.red,
-                            size: 25,
+                            size: 20,
                           ),
                           onPressed: () {},
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
                         ),
                       ],
                     ),
@@ -171,33 +175,28 @@ class BikeGridCard extends StatelessWidget {
                     Text(
                       listing.title,
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      listing.cardYearAndMileage,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      listing.location,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            listing.location,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
                     Text(
-                      '3 days ago',
+                      listing.timeAgo(),
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontSize: 12,
@@ -229,17 +228,19 @@ class BikeListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      margin: EdgeInsets.only(bottom: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(8)),
+      margin: EdgeInsets.only(bottom: 10),
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: onTap,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
               width: 160,
-              height: 150,
+              height: 200,
               child: Image.network(
                 listing.imageUrls[0],
                 fit: BoxFit.cover,
@@ -247,7 +248,7 @@ class BikeListCard extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -256,11 +257,10 @@ class BikeListCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Rs. ${formatter.format(listing.price)}',
+                            listing.formattedPrice,
                             style: TextStyle(
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green[600],
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -268,46 +268,41 @@ class BikeListCard extends StatelessWidget {
                         ),
                         IconButton(
                           icon: const Icon(
-                            CupertinoIcons.heart,
-                            color: Colors.red,
-                            size: 25,
+                            Icons.favorite_outline,
+                            size: 20,
                           ),
                           onPressed: () {},
                           padding: EdgeInsets.zero,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 10),
                     Text(
                       listing.title,
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      listing.location,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(CupertinoIcons.location, size: 14),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            listing.location,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
                     Text(
-                      '3 days ago',
+                      listing.cardYearAndMileage,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      listing.timeAgo(),
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontSize: 12,

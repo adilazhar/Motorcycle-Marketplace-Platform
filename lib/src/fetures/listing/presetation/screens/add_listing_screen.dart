@@ -137,7 +137,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
               final option = options[index];
               return ListTile(
                 title: Text(isEngineCapacity
-                    ? formatEngineSize(option)
+                    ? formatEngineCapacity(option)
                     : formatEnum(option)),
                 onTap: () {
                   onSelected(option);
@@ -628,7 +628,8 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(_selectedEngineCapacity != null
-                                  ? formatEngineSize(_selectedEngineCapacity!)
+                                  ? formatEngineCapacity(
+                                      _selectedEngineCapacity!)
                                   : 'Choose'),
                               Icon(Icons.keyboard_arrow_right_rounded),
                             ],

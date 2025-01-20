@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 enum BikeBrand {
   honda,
@@ -189,6 +190,8 @@ class BikeModels {
 // 1.New
 // 2.Used
 
+final formatter = NumberFormat('#,##,###');
+
 class Listing extends Equatable {
   final String id;
   final List<String> imageUrls;
@@ -229,6 +232,74 @@ class Listing extends Equatable {
     this.updatedAt,
     required this.userId,
   });
+
+  String get formattedMileage {
+    final formatter = NumberFormat('#,##,###');
+    return '${formatter.format(mileage)} km';
+  }
+
+  String get ignitionType {
+    return isSelfStart ? 'Self Start' : 'Kick Start';
+  }
+
+  String get formattedYear {
+    return year.toString();
+  }
+
+  String get formattedDate {
+    if (createdAt == null) {
+      return 'No date';
+    }
+
+    return DateFormat('dd/MM/yyyy').format(createdAt!);
+  }
+
+  String get cardYearAndMileage {
+    return '$year -  ${formatter.format(mileage)} Km';
+  }
+
+  String get formattedBrand {
+    return formatEnum(brand);
+  }
+
+  String get formattedEngineCapacity {
+    return formatEngineCapacity(engineCapacity);
+  }
+
+  String get formattedRegistrationCity {
+    return formatEnum(registrationCity);
+  }
+
+  String get condition {
+    return isNew ? 'New' : 'Used';
+  }
+
+  String get formattedPrice {
+    return 'Rs ${formatter.format(price)}';
+  }
+
+  String timeAgo() {
+    if (createdAt == null) return '';
+
+    final now = DateTime.now();
+    final difference = now.difference(createdAt!);
+
+    if (difference.inSeconds < 60) {
+      return '${difference.inSeconds} seconds ago';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays < 30) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inDays < 365) {
+      final months = (difference.inDays / 30).floor();
+      return '$months months ago';
+    } else {
+      final years = (difference.inDays / 365).floor();
+      return '$years years ago';
+    }
+  }
 
   /// Converts the Listing object to a map for creating a new Firestore document.
   /// Maybe Pass the user id through params of the method toMapForCreation(String uid) if needed
@@ -410,7 +481,7 @@ String formatEnum(Enum enumValue) {
   return words.join(' ');
 }
 
-String formatEngineSize(Enum enumValue) {
+String formatEngineCapacity(Enum enumValue) {
   final name = enumValue.name;
 
   // Handle 'below' case
