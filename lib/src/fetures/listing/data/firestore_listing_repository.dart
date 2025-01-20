@@ -16,6 +16,18 @@ class FirestoreListingRepository implements ListingRepository {
   FirestoreListingRepository(this._firestore);
 
   @override
+  Query<Listing> getListingsQuery() {
+    return _firestore
+        .collection('listings')
+        .orderBy('createdAt', descending: true)
+        .withConverter<Listing>(
+          fromFirestore: (snapshot, _) =>
+              Listing.fromMap(snapshot.id, snapshot.data()!),
+          toFirestore: (listing, _) => listing.toMapForCreation(),
+        );
+  }
+
+  @override
   Future<List<Listing>> fetchListings() async {
     try {
       QuerySnapshot querySnapshot = await _firestore

@@ -1,4 +1,5 @@
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class ListingRepository {
   Future<List<Listing>> fetchListings();
@@ -18,4 +19,6 @@ abstract class ListingRepository {
   Future<List<Listing>> fetchListingsByUserId(String userId);
 
   Stream<List<Listing>> watchListingsByUserId(String userId);
+
+  Query<Listing> getListingsQuery();
 }

@@ -3,11 +3,11 @@ import 'package:bike_listing/src/fetures/authentication/data/auth_user_repositor
 import 'package:bike_listing/src/fetures/authentication/presentation/account_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/controller/forgot_password_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/login_screen.dart';
-import 'package:bike_listing/home_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/name_entry_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/password_reset_email_sent_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/signup_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
+import 'package:bike_listing/src/fetures/listing/presetation/screens/home_screen.dart';
 import 'package:bike_listing/src/providers/firebase_auth.dart';
 import 'package:bike_listing/src/routing/go_router_refresh_stream.dart';
 import 'package:bike_listing/src/routing/not_found_screen.dart';
