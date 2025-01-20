@@ -7,6 +7,10 @@ import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'listing_service.g.dart';
+
 class ListingService {
   final Ref _ref;
   ListingService(this._ref);
@@ -193,7 +197,7 @@ class ListingService {
   }
 }
 
-// Providers
-final listingServiceProvider = Provider<ListingService>((ref) {
+@Riverpod(keepAlive: true)
+ListingService listingService(Ref ref) {
   return ListingService(ref);
-});
+}

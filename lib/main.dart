@@ -11,7 +11,8 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // TODO: Set This IP Before running
+  // Todo: Set This IP Before running
+  // Todo: Start The Local Emualators
   String host = '192.168.1.128';
   await FirebaseStorage.instance.useStorageEmulator(host, 9199);
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
@@ -19,6 +20,5 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-// Todo: Create A Controller and add the submit form method
 // Todo: Delete All User Listings When A User Deletes his Account
 // Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing
