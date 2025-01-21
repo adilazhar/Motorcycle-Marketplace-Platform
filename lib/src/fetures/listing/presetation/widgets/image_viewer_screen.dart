@@ -19,21 +19,29 @@ class ImageViewerScreen extends StatefulWidget {
 class _ImageViewerScreenState extends State<ImageViewerScreen> {
   late int currentIndex;
   late PageController pageController;
-  late PhotoViewController photoViewController;
+  bool isZoomed = false;
+  PhotoViewScaleStateController scaleStateController =
+      PhotoViewScaleStateController();
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.initialIndex;
     pageController = PageController(initialPage: currentIndex);
-    photoViewController = PhotoViewController();
+    scaleStateController.addIgnorableListener(_handleScaleState);
   }
 
   @override
   void dispose() {
     pageController.dispose();
-    photoViewController.dispose();
+    scaleStateController.dispose();
     super.dispose();
+  }
+
+  void _handleScaleState() {
+    setState(() {
+      isZoomed = scaleStateController.scaleState != PhotoViewScaleState.initial;
+    });
   }
 
   @override
@@ -47,14 +55,16 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         title: Text('${currentIndex + 1}/${widget.imageUrls.length}'),
       ),
       body: PhotoViewGallery.builder(
-        scrollPhysics: const ClampingScrollPhysics(),
+        scrollPhysics: isZoomed
+            ? const NeverScrollableScrollPhysics()
+            : const ClampingScrollPhysics(),
         builder: (BuildContext context, int index) {
           return PhotoViewGalleryPageOptions(
             imageProvider: NetworkImage("${widget.imageUrls[index]}.png"),
             initialScale: PhotoViewComputedScale.contained,
             minScale: PhotoViewComputedScale.contained,
             maxScale: PhotoViewComputedScale.covered * 2,
-            controller: photoViewController,
+            scaleStateController: scaleStateController,
             heroAttributes: PhotoViewHeroAttributes(tag: "image_$index"),
           );
         },
