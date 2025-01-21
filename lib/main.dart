@@ -13,6 +13,8 @@ void main() async {
 
   // Todo: Set This IP Before running
   // Todo: Start The Local Emualators
+  // firebase emulators:start --import=./seed --export-on-exit
+
   String host = '192.168.1.128';
   await FirebaseStorage.instance.useStorageEmulator(host, 9199);
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);

@@ -262,6 +262,10 @@ class Listing extends Equatable {
     return formatEnum(brand);
   }
 
+  String get adID {
+    return 'Ad ID: $id';
+  }
+
   String get formattedEngineCapacity {
     return formatEngineCapacity(engineCapacity);
   }

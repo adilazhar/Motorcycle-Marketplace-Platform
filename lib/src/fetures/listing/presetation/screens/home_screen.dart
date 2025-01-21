@@ -256,6 +256,7 @@ class BikeListCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
+                          flex: 8,
                           child: Text(
                             listing.formattedPrice,
                             style: TextStyle(
@@ -266,39 +267,46 @@ class BikeListCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.favorite_outline,
-                            size: 20,
+                        Expanded(
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.favorite_outline,
+                              size: 20,
+                            ),
+                            onPressed: () {},
+                            padding: EdgeInsets.zero,
                           ),
-                          onPressed: () {},
-                          padding: EdgeInsets.zero,
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      listing.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      listing.location,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      listing.cardYearAndMileage,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          listing.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          listing.location,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          listing.cardYearAndMileage,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 20),
                     Text(

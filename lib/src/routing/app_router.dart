@@ -138,16 +138,6 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
-      // GoRoute(
-      //   path: '/bike',
-      //   pageBuilder: (context, state) {
-      //     return buildPageWithDefaultTransition(
-      //       context: context,
-      //       state: state,
-      //       child: BikeDetailScreen(),
-      //     );
-      //   },
-      // ),
       GoRoute(
         path: '/sell',
         pageBuilder: (context, state) {
