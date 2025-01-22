@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -61,7 +62,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             : const ClampingScrollPhysics(),
         builder: (BuildContext context, int index) {
           return PhotoViewGalleryPageOptions(
-            imageProvider: NetworkImage("${widget.imageUrls[index]}.png"),
+            imageProvider:
+                CachedNetworkImageProvider('${widget.imageUrls[index]}.png'),
             initialScale: PhotoViewComputedScale.contained,
             minScale: PhotoViewComputedScale.contained,
             maxScale: PhotoViewComputedScale.covered * 2,

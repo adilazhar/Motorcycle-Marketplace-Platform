@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ImageGridLayout extends StatelessWidget {
@@ -102,11 +103,17 @@ class ImageGridLayout extends StatelessWidget {
   Widget _buildSingleImageTile(int index, double width, double height) {
     return GestureDetector(
       onTap: () => onImageTap(index),
-      child: Image.network(
-        "${images[index]}.png",
+      child: CachedNetworkImage(
+        imageUrl: '${images[index]}.png',
         width: width,
         height: height,
         fit: BoxFit.cover,
+        placeholder: (context, url) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        errorWidget: (context, url, error) => const Center(
+          child: Icon(Icons.error),
+        ),
       ),
     );
   }
@@ -119,10 +126,16 @@ class ImageGridLayout extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () => onImageTap(startIndex),
-              child: Image.network(
-                "${images[startIndex]}.png",
+              child: CachedNetworkImage(
+                imageUrl: '${images[startIndex]}.png',
                 height: height,
                 fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Center(
+                  child: Icon(Icons.error),
+                ),
               ),
             ),
           ),
@@ -130,10 +143,16 @@ class ImageGridLayout extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () => onImageTap(startIndex + 1),
-              child: Image.network(
-                "${images[startIndex + 1]}.png",
+              child: CachedNetworkImage(
+                imageUrl: '${images[startIndex + 1]}.png',
                 height: height,
                 fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Center(
+                  child: Icon(Icons.error),
+                ),
               ),
             ),
           ),
@@ -150,10 +169,16 @@ class ImageGridLayout extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () => onImageTap(startIndex),
-              child: Image.network(
-                "${images[startIndex]}.png",
+              child: CachedNetworkImage(
+                imageUrl: '${images[startIndex]}.png',
                 height: height,
                 fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Center(
+                  child: Icon(Icons.error),
+                ),
               ),
             ),
           ),
@@ -164,10 +189,16 @@ class ImageGridLayout extends StatelessWidget {
                 Expanded(
                   child: GestureDetector(
                     onTap: () => onImageTap(startIndex + 1),
-                    child: Image.network(
-                      "${images[startIndex + 1]}.png",
-                      width: double.infinity,
+                    child: CachedNetworkImage(
+                      imageUrl: '${images[startIndex + 1]}.png',
+                      height: height,
                       fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => const Center(
+                        child: Icon(Icons.error),
+                      ),
                     ),
                   ),
                 ),
@@ -175,10 +206,16 @@ class ImageGridLayout extends StatelessWidget {
                 Expanded(
                   child: GestureDetector(
                     onTap: () => onImageTap(startIndex + 2),
-                    child: Image.network(
-                      "${images[startIndex + 2]}.png",
-                      width: double.infinity,
+                    child: CachedNetworkImage(
+                      imageUrl: '${images[startIndex + 2]}.png',
+                      height: height,
                       fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => const Center(
+                        child: Icon(Icons.error),
+                      ),
                     ),
                   ),
                 ),

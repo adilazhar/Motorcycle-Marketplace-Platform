@@ -1,6 +1,7 @@
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/feature_card.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_grid_layout.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_viewer_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -129,10 +130,16 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                     items: widget.listing.imageUrls.map((url) {
                       return Builder(
                         builder: (BuildContext context) {
-                          return Image.network(
-                            url,
-                            fit: BoxFit.cover,
+                          return CachedNetworkImage(
                             width: double.infinity,
+                            imageUrl: url,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => const Center(
+                              child: Icon(Icons.error),
+                            ),
                           );
                         },
                       );

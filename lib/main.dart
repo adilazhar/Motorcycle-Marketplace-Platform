@@ -24,8 +24,6 @@ void main() async {
 
 
 /////Todo: Fix the form not showing the validation error (All the FormBuilderField custom field)
-// Todo: Change the Font
-// Todo: Get As Many Claude Accounts As Possible
 // Todo: Use cached_network_image instead of Image.Network 
 // Todo: Refactor the widgets to decrease the rebuilds
 // Todo: Delete All User Listings When A User Deletes his Account
