@@ -494,6 +494,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(
+                            errorText: field.errorText,
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
@@ -545,6 +546,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(
+                            errorText: field.errorText,
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
@@ -621,6 +623,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(
+                            errorText: field.errorText,
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
@@ -739,6 +742,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(
+                            errorText: field.errorText,
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),

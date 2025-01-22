@@ -1,10 +1,9 @@
 import 'package:bike_listing/src/fetures/listing/data/firestore_listing_repository.dart';
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
-import 'package:bike_listing/src/fetures/listing/presetation/screens/bike_detail_screen.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 enum ViewType { grid, list }
 
@@ -75,11 +74,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return BikeGridCard(
                         listing: listing,
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => BikeDetailScreen(listing),
-                          ));
+                          context.push('/bike_detail', extra: listing);
                         },
-                        formatter: formatter,
                       );
                     },
                   )
@@ -94,11 +90,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return BikeListCard(
                         listing: listing,
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => BikeDetailScreen(listing),
-                          ));
+                          context.push('/bike_detail', extra: listing);
                         },
-                        formatter: formatter,
                       );
                     },
                   );
@@ -112,13 +105,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class BikeGridCard extends StatelessWidget {
   final Listing listing;
   final VoidCallback onTap;
-  final NumberFormat formatter;
 
   const BikeGridCard({
     super.key,
     required this.listing,
     required this.onTap,
-    required this.formatter,
   });
 
   @override
@@ -216,13 +207,11 @@ class BikeGridCard extends StatelessWidget {
 class BikeListCard extends StatelessWidget {
   final Listing listing;
   final VoidCallback onTap;
-  final NumberFormat formatter;
 
   const BikeListCard({
     super.key,
     required this.listing,
     required this.onTap,
-    required this.formatter,
   });
 
   @override

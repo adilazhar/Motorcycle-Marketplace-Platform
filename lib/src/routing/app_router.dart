@@ -6,6 +6,7 @@ import 'package:bike_listing/src/fetures/authentication/presentation/login_scree
 import 'package:bike_listing/src/fetures/authentication/presentation/name_entry_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/password_reset_email_sent_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/signup_screen.dart';
+import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/bike_detail_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/home_screen.dart';
@@ -137,6 +138,17 @@ GoRouter appRouter(Ref ref) {
             ),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/bike_detail',
+        pageBuilder: (context, state) {
+          final listing = state.extra as Listing;
+          return buildPageWithBottomUpTransition(
+            context: context,
+            state: state,
+            child: BikeDetailScreen(listing),
+          );
+        },
       ),
       GoRoute(
         path: '/sell',

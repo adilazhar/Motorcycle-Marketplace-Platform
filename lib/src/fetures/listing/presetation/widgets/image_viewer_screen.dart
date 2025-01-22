@@ -52,6 +52,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
+        centerTitle: true,
         title: Text('${currentIndex + 1}/${widget.imageUrls.length}'),
       ),
       body: PhotoViewGallery.builder(
