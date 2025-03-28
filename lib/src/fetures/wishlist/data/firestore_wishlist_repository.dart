@@ -1,6 +1,10 @@
 import 'package:bike_listing/src/fetures/wishlist/data/wishlist_repository.dart';
 import 'package:bike_listing/src/fetures/wishlist/domain/wishlist.dart';
+import 'package:bike_listing/src/providers/firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+part 'firestore_wishlist_repository.g.dart';
 
 class FirestoreWishlistRepository implements WishlistRepository {
   final FirebaseFirestore _firestore;
@@ -71,4 +75,10 @@ class FirestoreWishlistRepository implements WishlistRepository {
       return Wishlist.fromMap(docSnapshot.data() as Map<String, dynamic>);
     });
   }
+}
+
+@Riverpod(keepAlive: true)
+WishlistRepository wishlistRepository(Ref ref) {
+  final firestore = ref.read(firestoreProvider);
+  return FirestoreWishlistRepository(firestore);
 }
