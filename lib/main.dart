@@ -32,4 +32,6 @@ void main() async {
 // TODO: Add Security Rules to Firestore
 // TODO: When a User deletes its account delete all the ads and also clear his data from the firestore
 // TODO: Learn How to Create A Kanban Board By Learning to create a ReorderableListView
-// TODO: Implement the WishList
+
+
+// TODO: Optimize the WishList Icon Button For the Bike Detail Screen

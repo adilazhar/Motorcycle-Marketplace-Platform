@@ -1,4 +1,5 @@
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
+import 'package:bike_listing/src/fetures/wishlist/presentation/widgets/wishlist_button.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -61,14 +62,7 @@ class BikeListCard extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.favorite_outline,
-                              size: 20,
-                            ),
-                            onPressed: () {},
-                            padding: EdgeInsets.zero,
-                          ),
+                          child: WishlistButton(listingId: listing.id),
                         ),
                       ],
                     ),

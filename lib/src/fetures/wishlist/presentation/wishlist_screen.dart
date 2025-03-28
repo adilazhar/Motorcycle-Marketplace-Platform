@@ -13,22 +13,32 @@ class WishlistScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final wishListedListings = ref.watch(watchUserWishlistedListingsProvider);
     return Scaffold(
-        body: wishListedListings.when(
-      data: (data) => ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          final listing = data[index];
-          return BikeListCard(
-            listing: listing,
-            onTap: () {
-              context.push('/bike_detail', extra: listing);
+        body: Padding(
+      padding: EdgeInsets.all(8),
+      child: wishListedListings.when(
+        data: (data) {
+          if (data.isEmpty) {
+            return Center(
+              child: Text('Try Adding Something To Wishlist'),
+            );
+          }
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final listing = data[index];
+              return BikeListCard(
+                listing: listing,
+                onTap: () {
+                  context.push('/bike_detail', extra: listing);
+                },
+              );
             },
           );
         },
-      ),
-      error: (error, stackTrace) => Center(child: Text('Error: $error')),
-      loading: () => Center(
-        child: CircularProgressIndicator(),
+        error: (error, stackTrace) => Center(child: Text('Error: $error')),
+        loading: () => Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     ));
   }

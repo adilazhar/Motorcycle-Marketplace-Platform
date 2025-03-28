@@ -1,6 +1,7 @@
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/feature_card.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_grid_layout.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_viewer_screen.dart';
+import 'package:bike_listing/src/fetures/wishlist/presentation/widgets/wishlist_button.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -62,11 +63,7 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                 onPressed: () => Navigator.pop(context),
               ),
               actions: [
-                IconButton(
-                  icon: Icon(Icons.favorite_border,
-                      color: Color.lerp(Colors.white, Colors.black, opacity)),
-                  onPressed: () {},
-                ),
+                WishlistButton(listingId: widget.listing.id),
               ],
               title: Opacity(
                 opacity: opacity,

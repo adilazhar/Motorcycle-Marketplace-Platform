@@ -2,7 +2,7 @@ import 'package:bike_listing/src/fetures/listing/data/firestore_listing_reposito
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/bike_grid_card.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/bike_list_card.dart';
-import 'package:bike_listing/src/fetures/listing/wishlist_service.dart';
+import 'package:bike_listing/src/fetures/wishlist/application/wishlist_service.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
