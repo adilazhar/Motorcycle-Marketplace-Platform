@@ -4,10 +4,13 @@ import 'package:bike_listing/src/fetures/listing/data/firestore_listing_reposito
 import 'package:bike_listing/src/fetures/listing/data/image_repository.dart';
 import 'package:bike_listing/src/fetures/listing/data/listing_repository.dart';
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
+import 'package:bike_listing/src/fetures/wishlist/data/firestore_wishlist_repository.dart';
+import 'package:bike_listing/src/fetures/wishlist/data/wishlist_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'listing_service.g.dart';
 
@@ -20,6 +23,8 @@ class ListingService {
   ImageRepository get _imageRepository => _ref.read(imageRepositoryProvider);
   AuthUserRepository get _authRepository =>
       _ref.read(authUserRepositoryProvider);
+  WishlistRepository get _wishlistRepository =>
+      _ref.read(wishlistRepositoryProvider);
 
   /// Creates a new listing with images
   Future<void> createListing(Listing listing, List<File> images) async {
@@ -146,6 +151,23 @@ class ListingService {
     return _listingRepository.watchListingsByUserId(userId);
   }
 
+  /// Watches (streams) all wishlistedListings for the current user
+  Stream<List<Listing>> watchUserWishlistedListings() {
+    final userId = _authRepository.currentUser?.uid;
+    if (userId == null) {
+      throw Exception('No authenticated user found');
+    }
+
+    return _wishlistRepository.watchWishlistforUserid(userId).switchMap(
+      (wishlist) {
+        if (wishlist.listingIds.isEmpty) {
+          return Stream.value(<Listing>[]);
+        }
+        return _listingRepository.watchWishlistListings(wishlist.listingIds);
+      },
+    );
+  }
+
   /// Fetches a single listing by ID
   Future<Listing> getListingById(String id) async {
     return _listingRepository.getListingById(id);
@@ -166,4 +188,10 @@ class ListingService {
 @Riverpod(keepAlive: true)
 ListingService listingService(Ref ref) {
   return ListingService(ref);
+}
+
+@Riverpod(keepAlive: true)
+Stream<List<Listing>> watchUserWishlistedListings(Ref ref) {
+  final listingService = ref.read(listingServiceProvider);
+  return listingService.watchUserWishlistedListings();
 }

@@ -43,7 +43,7 @@ class WishlistService {
     return _wishlistRepository.removeFromWishlist(userId, listingId);
   }
 
-  Stream<Wishlist> watchWishlistforUserid() {
+  Stream<Wishlist> watchWishlist() {
     final userId = uid;
     if (userId == null) {
       throw Exception('No authenticated user found');
@@ -51,7 +51,7 @@ class WishlistService {
     return _wishlistRepository.watchWishlistforUserid(userId);
   }
 
-  Future<Wishlist> getWishlistforUserid() async {
+  Future<Wishlist> getWishlist() async {
     final userId = uid;
     if (userId == null) {
       throw Exception('No authenticated user found');
@@ -63,4 +63,10 @@ class WishlistService {
 @Riverpod(keepAlive: true)
 WishlistService wishlistService(Ref ref) {
   return WishlistService(ref);
+}
+
+@Riverpod(keepAlive: true)
+Stream<Wishlist> watchWishlist(Ref ref) {
+  final wishlistService = ref.read(wishlistServiceProvider);
+  return wishlistService.watchWishlist();
 }

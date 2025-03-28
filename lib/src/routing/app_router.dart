@@ -10,6 +10,7 @@ import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/bike_detail_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/home_screen.dart';
+import 'package:bike_listing/src/fetures/wishlist/presentation/wishlist_screen.dart';
 import 'package:bike_listing/src/providers/firebase_auth.dart';
 import 'package:bike_listing/src/routing/go_router_refresh_stream.dart';
 import 'package:bike_listing/src/routing/not_found_screen.dart';
@@ -119,9 +120,7 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
               path: '/wishlist',
               pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                  context: context,
-                  state: state,
-                  child: Scaffold(body: Center(child: Text('Wishlist'))))),
+                  context: context, state: state, child: WishlistScreen())),
           GoRoute(
             path: '/my_ads',
             pageBuilder: (context, state) => buildPageWithDefaultTransition(

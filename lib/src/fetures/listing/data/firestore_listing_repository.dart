@@ -152,6 +152,31 @@ class FirestoreListingRepository implements ListingRepository {
             .map((doc) => Listing.fromMap(doc.id, doc.data()))
             .toList());
   }
+
+  @override
+  Stream<List<Listing>> watchWishlistListings(List<String> wishListed) {
+    if (wishListed.isEmpty) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('listings')
+        .where(FieldPath.documentId, whereIn: wishListed)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((querySnapshot) {
+      // final foundIds = querySnapshot.docs.map((doc) => doc.id).toSet();
+      // final missingIds = wishListed.where((id) => !foundIds.contains(id));
+
+      // if (missingIds.isNotEmpty) {
+      //   debugPrint('Some wishlisted listings were not found: $missingIds');
+      // }
+
+      return querySnapshot.docs
+          .map((doc) => Listing.fromMap(doc.id, doc.data()))
+          .toList();
+    });
+  }
 }
 
 @Riverpod(keepAlive: true)
