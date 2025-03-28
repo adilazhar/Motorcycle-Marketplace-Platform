@@ -33,9 +33,13 @@ class BikeGridCard extends StatelessWidget {
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
                 ),
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(Icons.error),
-                ),
+                errorWidget: (context, url, error) {
+                  debugPrint(url);
+                  debugPrint(error.toString());
+                  return const Center(
+                    child: Icon(Icons.error),
+                  );
+                },
               ),
             ),
             Expanded(

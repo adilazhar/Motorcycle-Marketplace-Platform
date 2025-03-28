@@ -21,47 +21,13 @@ class ListingService {
   AuthUserRepository get _authRepository =>
       _ref.read(authUserRepositoryProvider);
 
-  // * Images Picking and converting them to File
-  // * Variable:
-  // final List<XFile> _selectedImages = [];
-  // * Pick Images Method
-  //  Future<void> _pickImages() async {
-  //   final ImagePicker picker = ImagePicker();
-  //   final List<XFile> images = await picker.pickMultiImage();
-  //   setState(() {
-  //     _selectedImages.addAll(images);
-  //   });
-  // }
-  // * Convert XFile to File for upload
-  // final imageFiles = _selectedImages
-  //     .map((xFile) => File(xFile.path))
-  //     .toList();
-  // * Widget to display the images
-  // if (_selectedImages.isNotEmpty) ...[
-  //               const SizedBox(height: 16),
-  //               SizedBox(
-  //                 height: 100,
-  //                 child: ListView.builder(
-  //                   scrollDirection: Axis.horizontal,
-  //                   itemCount: _selectedImages.length,
-  //                   itemBuilder: (context, index) {
-  //                     return Padding(
-  //                       padding: const EdgeInsets.only(right: 8),
-  //                       child: Image.file(
-  //                         File(_selectedImages[index].path),
-  //                         width: 100,
-  //                         fit: BoxFit.cover,
-  //                       ),
-  //                     );
-  //                   },
-  //                 ),
-  //               ),
-  //             ],
   /// Creates a new listing with images
   Future<void> createListing(Listing listing, List<File> images) async {
     try {
       // First upload images to get URLs
       final imageUrls = await _imageRepository.uploadImages(images);
+
+      // TODO: Iterate through image urls and replace the ip with 127.0.0.1 in each of their address in Dev Mode
 
       // Create new listing with the image URLs
       final listingWithImages = listing.copyWith(
