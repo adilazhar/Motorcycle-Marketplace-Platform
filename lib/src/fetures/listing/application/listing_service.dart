@@ -14,6 +14,9 @@ import 'package:rxdart/rxdart.dart';
 
 part 'listing_service.g.dart';
 
+// TODO: Add a method to add listingId to the current userMeta
+// TODO: first upload the listing to the firestore and return the id and use the id to store the id to userMeta
+
 class ListingService {
   final Ref _ref;
   ListingService(this._ref);

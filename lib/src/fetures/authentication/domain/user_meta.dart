@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Represents user metadata stored in Firestore.
@@ -7,13 +8,10 @@ class UserMeta {
   final String? bio;
   final DateTime? joinDate;
   final String? email;
+  final List<String>? userListings;
 
-  UserMeta({
-    this.userName,
-    this.bio,
-    this.joinDate,
-    this.email,
-  });
+  UserMeta(
+      {this.userName, this.bio, this.joinDate, this.email, this.userListings});
 
   /// factory method for creating usermeta from user input
   factory UserMeta.fromInput(String userName, String email) {
@@ -32,6 +30,7 @@ class UserMeta {
           ? FieldValue.serverTimestamp()
           : Timestamp.fromDate(joinDate!),
       'email': email,
+      'userListings': userListings,
     };
   }
 
@@ -44,6 +43,9 @@ class UserMeta {
           ? (map['joinDate'] as Timestamp).toDate()
           : null,
       email: map['email'] as String?,
+      userListings: map['userListings'] != null
+          ? List<String>.from(map['userListings'])
+          : null,
     );
   }
 
@@ -74,12 +76,14 @@ class UserMeta {
     String? bio,
     DateTime? joinDate,
     String? email,
+    List<String>? userListings,
   }) {
     return UserMeta(
       userName: userName ?? this.userName,
       bio: bio ?? this.bio,
       joinDate: joinDate ?? this.joinDate,
       email: email ?? this.email,
+      userListings: userListings ?? this.userListings,
     );
   }
 
@@ -91,17 +95,22 @@ class UserMeta {
         userName == other.userName &&
         bio == other.bio &&
         joinDate == other.joinDate &&
-        email == other.email;
+        email == other.email &&
+        userListings == other.userListings;
   }
 
   /// Overrides the [hashCode] method for consistency with [==].
   @override
   int get hashCode =>
-      userName.hashCode ^ bio.hashCode ^ joinDate.hashCode ^ email.hashCode;
+      userName.hashCode ^
+      bio.hashCode ^
+      joinDate.hashCode ^
+      email.hashCode ^
+      userListings.hashCode;
 
   /// Overrides the [toString] method for a readable representation of the object.
   @override
   String toString() {
-    return 'UserMeta(userName: $userName, bio: $bio, joinDate: $joinDate, email: $email)';
+    return 'UserMeta(userName: $userName, bio: $bio, joinDate: $joinDate, email: $email, userListings: $userListings)';
   }
 }

@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+// TODO: Optimize the code for less rerenders
+
 enum ViewType { grid, list }
 
 class HomeScreen extends ConsumerStatefulWidget {

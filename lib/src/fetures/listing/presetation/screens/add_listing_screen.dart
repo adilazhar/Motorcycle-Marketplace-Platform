@@ -251,7 +251,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
         }
       }
 
-      // Get location with lower accuracy
+      // Get location with accuracy
       final position = await Geolocator.getCurrentPosition(
         locationSettings: AndroidSettings(accuracy: LocationAccuracy.best),
       );
