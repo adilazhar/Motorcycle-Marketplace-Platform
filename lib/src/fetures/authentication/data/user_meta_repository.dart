@@ -6,8 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_meta_repository.g.dart';
 
-// TODO: Add addToUserListing(String id) to the repo
-
 /// Repository for managing UserMeta data in Firestore.
 class UserMetaRepository {
   UserMetaRepository(this._firestore);
@@ -36,6 +34,18 @@ class UserMetaRepository {
         .collection('users')
         .doc(uid)
         .update(userMeta.toFirestore());
+  }
+
+  Future<void> addToUserListing(String uid, String listingId) async {
+    await _firestore.collection('users').doc(uid).update({
+      'userListings': FieldValue.arrayUnion([listingId])
+    });
+  }
+
+  Future<void> removeFromUserListing(String uid, String listingId) async {
+    await _firestore.collection('users').doc(uid).update({
+      'userListings': FieldValue.arrayRemove([listingId])
+    });
   }
 
   /// Deletes the [UserMeta] document for the given user ID.

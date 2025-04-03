@@ -1,4 +1,5 @@
 import 'package:bike_listing/src/fetures/authentication/data/auth_user_repository.dart';
+import 'package:bike_listing/src/fetures/authentication/data/user_meta_repository.dart';
 import 'package:bike_listing/src/fetures/listing/data/firebase_storage_image_repository.dart';
 import 'package:bike_listing/src/fetures/listing/data/firestore_listing_repository.dart';
 import 'package:bike_listing/src/fetures/listing/data/image_repository.dart';
@@ -14,9 +15,6 @@ import 'package:rxdart/rxdart.dart';
 
 part 'listing_service.g.dart';
 
-// TODO: Add a method to add listingId to the current userMeta
-// TODO: first upload the listing to the firestore and return the id and use the id to store the id to userMeta
-
 class ListingService {
   final Ref _ref;
   ListingService(this._ref);
@@ -28,10 +26,16 @@ class ListingService {
       _ref.read(authUserRepositoryProvider);
   WishlistRepository get _wishlistRepository =>
       _ref.read(wishlistRepositoryProvider);
+  UserMetaRepository get _userMetarepository =>
+      _ref.read(userMetaRepositoryProvider);
 
   /// Creates a new listing with images
   Future<void> createListing(Listing listing, List<File> images) async {
     try {
+      final userId = _authRepository.currentUser?.uid;
+      if (userId == null) {
+        throw Exception('No authenticated user found');
+      }
       // First upload images to get URLs
       final imageUrls = await _imageRepository.uploadImages(images);
 
@@ -43,7 +47,9 @@ class ListingService {
         userId: _authRepository.currentUser?.uid ?? '',
       );
 
-      await _listingRepository.createListing(listingWithImages);
+      final listingId =
+          await _listingRepository.createListing(listingWithImages);
+      _userMetarepository.addToUserListing(userId, listingId);
     } catch (e) {
       // If any error occurs after uploading images, clean them up
       if (listing.imageUrls.isNotEmpty) {
@@ -56,6 +62,10 @@ class ListingService {
   /// Deletes a listing and its associated images
   Future<void> deleteListing(Listing listing) async {
     try {
+      final userId = _authRepository.currentUser?.uid;
+      if (userId == null) {
+        throw Exception('No authenticated user found');
+      }
       // Delete the listing
       await _listingRepository.deleteListing(listing.id);
 
@@ -63,6 +73,8 @@ class ListingService {
       if (listing.imageUrls.isNotEmpty) {
         await _imageRepository.deleteImages(listing.imageUrls);
       }
+
+      await _userMetarepository.removeFromUserListing(userId, listing.id);
     } catch (e) {
       rethrow;
     }

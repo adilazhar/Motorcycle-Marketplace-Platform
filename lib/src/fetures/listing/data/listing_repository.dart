@@ -6,7 +6,7 @@ abstract class ListingRepository {
 
   Future<Listing> getListingById(String id);
 
-  Future<void> createListing(Listing listing);
+  Future<String> createListing(Listing listing);
 
   Future<void> deleteListing(String id);
 

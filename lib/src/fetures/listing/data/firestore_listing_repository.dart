@@ -63,9 +63,12 @@ class FirestoreListingRepository implements ListingRepository {
   }
 
   @override
-  Future<void> createListing(Listing listing) async {
+  Future<String> createListing(Listing listing) async {
     try {
-      await _firestore.collection('listings').add(listing.toMapForCreation());
+      final docRef = await _firestore
+          .collection('listings')
+          .add(listing.toMapForCreation());
+      return docRef.id;
     } catch (e) {
       debugPrint('Error creating listing: ${e.toString()}');
       rethrow;
