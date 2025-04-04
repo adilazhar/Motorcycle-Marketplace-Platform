@@ -7,6 +7,7 @@ import 'package:bike_listing/src/fetures/authentication/presentation/name_entry_
 import 'package:bike_listing/src/fetures/authentication/presentation/password_reset_email_sent_screen.dart';
 import 'package:bike_listing/src/fetures/authentication/presentation/signup_screen.dart';
 import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
+import 'package:bike_listing/src/fetures/listing/presetation/my_ads_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/bike_detail_screen.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/screens/home_screen.dart';
@@ -124,9 +125,7 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: '/my_ads',
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                context: context,
-                state: state,
-                child: Scaffold(body: Center(child: Text('My Ads')))),
+                context: context, state: state, child: MyAdsScreen()),
           ),
           GoRoute(
             path: '/account',

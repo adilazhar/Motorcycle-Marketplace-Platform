@@ -20,7 +20,7 @@ abstract class ListingRepository {
 
   Stream<List<Listing>> watchListingsByUserId(String userId);
 
-  Stream<List<Listing>> watchWishlistListings(List<String> wishListed);
+  Stream<List<Listing>> watchListingsById(List<String> wishListed);
 
   Query<Listing> getListingsQuery();
 }

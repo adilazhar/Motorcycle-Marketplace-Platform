@@ -178,7 +178,7 @@ class ListingService {
         if (wishlist.listingIds.isEmpty) {
           return Stream.value(<Listing>[]);
         }
-        return _listingRepository.watchWishlistListings(wishlist.listingIds);
+        return _listingRepository.watchListingsById(wishlist.listingIds);
       },
     );
   }
@@ -209,4 +209,10 @@ ListingService listingService(Ref ref) {
 Stream<List<Listing>> watchUserWishlistedListings(Ref ref) {
   final listingService = ref.read(listingServiceProvider);
   return listingService.watchUserWishlistedListings();
+}
+
+@Riverpod(keepAlive: true)
+Stream<List<Listing>> watchListingsFromCurrentUser(Ref ref) {
+  final listingService = ref.read(listingServiceProvider);
+  return listingService.watchListingsForCurrentUser();
 }
