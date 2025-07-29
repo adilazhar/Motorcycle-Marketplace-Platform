@@ -23,12 +23,10 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-// TODO: Fix the Location button in the Add listing page
-// Todo: Refactor the widgets to decrease the rebuilds
 // Todo: Delete All User Listings When A User Deletes his Account
 // Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing
 // Todo: Add the editing page , user listing page
-// TODO: The images are not being loaded bcz it adds the current ip address when uploaded to the storage
+// TODO: Add the delete button to listings
 
 // TODO: Add Security Rules to Firestore
 // TODO: When a User deletes its account delete all the ads and also clear his data from the firestore
