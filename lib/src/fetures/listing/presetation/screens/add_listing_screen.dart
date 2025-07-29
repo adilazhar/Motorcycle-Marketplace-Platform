@@ -671,7 +671,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
 
                   // Ignition Type Field
                   Text('Ignition Type *'),
-                  FormBuilderChoiceChip(
+                  FormBuilderChoiceChips(
                     name: 'isSelfStart',
                     showCheckmark: false,
                     spacing: 10,
@@ -697,7 +697,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
 
                   // Condition Field
                   Text('Condition *'),
-                  FormBuilderChoiceChip(
+                  FormBuilderChoiceChips(
                     name: 'condition',
                     showCheckmark: false,
                     spacing: 10,

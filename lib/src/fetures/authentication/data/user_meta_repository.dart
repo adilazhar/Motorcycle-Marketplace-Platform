@@ -17,6 +17,7 @@ class UserMetaRepository {
         snapshot.exists ? UserMeta.fromFirestore(snapshot) : null);
   }
 
+  // TODO: use this method to fetch the user meta from and display
   /// Fetches the [UserMeta] for the given user ID once.
   Future<UserMeta?> fetchUserMeta(String uid) async {
     final snapshot = await _firestore.collection('users').doc(uid).get();
@@ -66,4 +67,10 @@ UserMetaRepository userMetaRepository(Ref ref) {
 Stream<UserMeta?> watchUserMeta(Ref ref, String uid) {
   final userMetaRepo = ref.watch(userMetaRepositoryProvider);
   return userMetaRepo.watchUserMeta(uid);
+}
+
+@Riverpod(keepAlive: true)
+FutureOr<UserMeta?> fetchUserMeta(Ref ref, String uid) {
+  final userMetaRepo = ref.watch(userMetaRepositoryProvider);
+  return userMetaRepo.fetchUserMeta(uid);
 }

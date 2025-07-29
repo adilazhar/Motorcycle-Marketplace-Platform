@@ -16,7 +16,10 @@ class AccountScreen extends ConsumerWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           automaticallyImplyLeading: false,
-          title: Text('Account'),
+          title: Text(
+            'Account',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),

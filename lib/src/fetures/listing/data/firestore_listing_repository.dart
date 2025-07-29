@@ -167,18 +167,9 @@ class FirestoreListingRepository implements ListingRepository {
         .where(FieldPath.documentId, whereIn: wishListed)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((querySnapshot) {
-      // final foundIds = querySnapshot.docs.map((doc) => doc.id).toSet();
-      // final missingIds = wishListed.where((id) => !foundIds.contains(id));
-
-      // if (missingIds.isNotEmpty) {
-      //   debugPrint('Some wishlisted listings were not found: $missingIds');
-      // }
-
-      return querySnapshot.docs
-          .map((doc) => Listing.fromMap(doc.id, doc.data()))
-          .toList();
-    });
+        .map((querySnapshot) => querySnapshot.docs
+            .map((doc) => Listing.fromMap(doc.id, doc.data()))
+            .toList());
   }
 }
 
@@ -186,4 +177,10 @@ class FirestoreListingRepository implements ListingRepository {
 ListingRepository listingRepository(Ref ref) {
   final firestore = ref.read(firestoreProvider);
   return FirestoreListingRepository(firestore);
+}
+
+@riverpod
+FutureOr<List<Listing>> fetchListingsForUser(Ref ref, String uid) {
+  final listingRepo = ref.read(listingRepositoryProvider);
+  return listingRepo.fetchListingsByUserId(uid);
 }

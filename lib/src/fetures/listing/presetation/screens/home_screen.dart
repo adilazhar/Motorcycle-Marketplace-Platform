@@ -3,6 +3,7 @@ import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/bike_grid_card.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/bike_list_card.dart';
 import 'package:bike_listing/src/fetures/wishlist/application/wishlist_service.dart';
+import 'package:bike_listing/src/utils/constant.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,20 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   ViewType _viewType = ViewType.list;
+
+  List<String> _replaceIpInImageUrls(List<String> imageUrls) {
+    return imageUrls.map((url) {
+      final uri = Uri.tryParse(url);
+      if (uri == null || uri.host.isEmpty) return url;
+      final newUri = uri.replace(host: AppConstants.ipAddress);
+      return newUri.toString();
+    }).toList();
+  }
+
+  Listing _withUpdatedImageUrls(Listing listing) {
+    final updatedUrls = _replaceIpInImageUrls(listing.imageUrls);
+    return listing.copyWith(imageUrls: updatedUrls);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +87,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     itemCount: snapshot.docs.length,
                     itemBuilder: (context, index) {
-                      final listing = snapshot.docs[index].data();
+                      Listing listing = snapshot.docs[index].data();
+                      listing = _withUpdatedImageUrls(listing);
                       if (snapshot.hasMore &&
                           index + 1 == snapshot.docs.length) {
                         snapshot.fetchMore();
@@ -88,7 +104,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : ListView.builder(
                     itemCount: snapshot.docs.length,
                     itemBuilder: (context, index) {
-                      final listing = snapshot.docs[index].data();
+                      Listing listing = snapshot.docs[index].data();
+                      listing = _withUpdatedImageUrls(listing);
                       if (snapshot.hasMore &&
                           index + 1 == snapshot.docs.length) {
                         snapshot.fetchMore();

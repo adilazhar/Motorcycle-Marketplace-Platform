@@ -147,6 +147,19 @@ GoRouter appRouter(Ref ref) {
             child: BikeDetailScreen(listing),
           );
         },
+        // routes: [
+        //   GoRoute(
+        //     path: 'owner_detail',
+        //     pageBuilder: (context, state) {
+        //       final ownerId = state.extra as String;
+        //       return buildPageWithBottomUpTransition(
+        //         context: context,
+        //         state: state,
+        //         child: OwnerDetailScreen(ownerId),
+        //       );
+        //     },
+        //   ),
+        // ],
       ),
       GoRoute(
         path: '/sell',

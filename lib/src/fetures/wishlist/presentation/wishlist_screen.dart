@@ -1,5 +1,7 @@
 import 'package:bike_listing/src/fetures/listing/application/listing_service.dart';
+import 'package:bike_listing/src/fetures/listing/domain/listing.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/bike_list_card.dart';
+import 'package:bike_listing/src/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +10,20 @@ class WishlistScreen extends ConsumerWidget {
   const WishlistScreen({
     super.key,
   });
+
+  List<String> _replaceIpInImageUrls(List<String> imageUrls) {
+    return imageUrls.map((url) {
+      final uri = Uri.tryParse(url);
+      if (uri == null || uri.host.isEmpty) return url;
+      final newUri = uri.replace(host: AppConstants.ipAddress);
+      return newUri.toString();
+    }).toList();
+  }
+
+  Listing _withUpdatedImageUrls(Listing listing) {
+    final updatedUrls = _replaceIpInImageUrls(listing.imageUrls);
+    return listing.copyWith(imageUrls: updatedUrls);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +47,8 @@ class WishlistScreen extends ConsumerWidget {
               return ListView.builder(
                 itemCount: data.length,
                 itemBuilder: (context, index) {
-                  final listing = data[index];
+                  var listing = data[index];
+                  listing = _withUpdatedImageUrls(listing);
                   return BikeListCard(
                     listing: listing,
                     onTap: () {

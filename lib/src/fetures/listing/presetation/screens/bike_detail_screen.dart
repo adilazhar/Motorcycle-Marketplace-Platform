@@ -1,6 +1,7 @@
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/feature_card.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_grid_layout.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_viewer_screen.dart';
+import 'package:bike_listing/src/fetures/listing/presetation/widgets/owner_card.dart';
 import 'package:bike_listing/src/fetures/wishlist/presentation/widgets/wishlist_button.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -335,8 +336,8 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                       children: [
                         TileLayer(
                           urlTemplate:
-                              'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          subdomains: ['a', 'b', 'c'],
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.adistudio.bike_listing',
                         ),
                         MarkerLayer(
                           markers: [
@@ -356,8 +357,11 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                   ),
 
                   // Seller Information Section
-                  // const SizedBox(height: 24),
-                  // _buildSellerSection(),
+                  const SizedBox(height: 16),
+                  Divider(),
+                  const SizedBox(height: 16),
+
+                  OwnerCard(widget.listing.userId),
                 ],
               ),
             ),
@@ -366,53 +370,6 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
       ),
     );
   }
-
-//   Widget _buildSellerSection() {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const Text('Seller Information',
-//             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//         const SizedBox(height: 16),
-//         Stack(
-//           children: [
-//             Column(
-//               children: List.generate(
-//                 2,
-//                 (index) => Padding(
-//                   padding: const EdgeInsets.only(bottom: 16),
-//                   child: Row(
-//                     children: [
-//                       CircleAvatar(
-//                         radius: 24,
-//                         backgroundColor: Colors.blue[600],
-//                         child: const Text('S',
-//                             style: TextStyle(color: Colors.white)),
-//                       ),
-//                       const SizedBox(width: 16),
-//                       const Expanded(
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text('Seller Name',
-//                                 style: TextStyle(fontWeight: FontWeight.bold)),
-//                             Text('Member since Jan 2024',
-//                                 style: TextStyle(color: Colors.grey)),
-//                             Text('View Profile',
-//                                 style: TextStyle(color: Colors.blue)),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ],
-//     );
-//   }
 }
 
 class InteractiveMapScreen extends StatelessWidget {
