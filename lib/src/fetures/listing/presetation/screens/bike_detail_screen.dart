@@ -13,7 +13,8 @@ import 'package:latlong2/latlong.dart';
 
 class BikeDetailScreen extends StatefulWidget {
   final Listing listing;
-  const BikeDetailScreen(this.listing, {super.key});
+  final bool toShowUserCard;
+  const BikeDetailScreen(this.listing, {super.key, this.toShowUserCard = true});
 
   @override
   State<BikeDetailScreen> createState() => _BikeDetailScreenState();
@@ -357,11 +358,12 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                   ),
 
                   // Seller Information Section
-                  const SizedBox(height: 16),
-                  Divider(),
-                  const SizedBox(height: 16),
-
-                  OwnerCard(widget.listing.userId),
+                  if (widget.toShowUserCard) ...[
+                    const SizedBox(height: 16),
+                    Divider(),
+                    const SizedBox(height: 16),
+                    OwnerCard(widget.listing.userId),
+                  ],
                 ],
               ),
             ),

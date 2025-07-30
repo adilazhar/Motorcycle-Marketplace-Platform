@@ -54,7 +54,7 @@ class AppUserService {
     if (authUser == null) return;
 
     await ref.read(authUserRepositoryProvider).deleteUser(email, password);
-    await ref.read(userMetaRepositoryProvider).deleteUserMeta(authUser.uid);
+    // await ref.read(userMetaRepositoryProvider).deleteUserMeta(authUser.uid);
   }
 
   /// Signs in the user using [AuthUserRepository].

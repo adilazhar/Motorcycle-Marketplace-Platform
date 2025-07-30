@@ -23,6 +23,7 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
+// TODO: Make the Bike Detail Screen configurable to show or hide the user account card
 // Todo: Delete All User Listings When A User Deletes his Account
 // Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing
 // Todo: Add the editing page , user listing page
@@ -32,13 +33,68 @@ void main() async {
 // TODO: When a User deletes its account delete all the ads and also clear his data from the firestore
 // TODO: Learn How to Create A Kanban Board By Learning to create a ReorderableListView
 
-
 // TODO: Optimize the WishList Icon Button For the Bike Detail Screen
 // TODO: Add Search bar to the registration city enum add form
 
 // TODO: Create User Card And Show it in each detail screen in the end , on click navigates the user to that user listings page
 
-// TODO: Use UserMetaRepository.fetchUserMeta with the listing userid
-// TODO: Create Owner Card
-// TODO: Create User Screen with user detail + all his listings
-// TODO: make the owner card tappable to go to user detail screen
+/* 
+Here is the firestore collections for my app :
+
+1.listings Collection:
+listings/
+    {document_id}/
+        imageUrls: string[]
+        title: string
+        description: string
+        price: number
+        year: number
+        mileage: number
+        brand: string
+        model: string
+        engineCapacity: string
+        registrationCity: string
+        isSelfStart: boolean
+        isNew: boolean
+        coordinates: GeoPoint
+        location: string
+        createdAt: timestamp
+        updatedAt: timestamp
+        userId: string
+
+2.users Collection:
+users/
+    {uid}/  # User's Firebase Auth UID
+        userName: string
+        bio: string
+        joinDate: timestamp
+        email: string
+
+3.wishlist Collection:
+wishlist/
+    {uid}/  # User's Firebase Auth UID
+        listingIds: string[]  # Array of favorited listing IDs
+
+
+####
+And here is the storage structure for images:
+
+Storage Structure:
+firebase-storage/
+    listings/
+        {uuid}.jpg // Compressed images with metadata
+
+
+When a user deletes their account, need to:
+- Delete user's auth account
+- Delete user document from users collection
+- Delete all listings where userId matches
+- Delete All images in firebase-storage/listings/{uuid}.jpg for each listing
+- Remove user's listings from other users' wishlists
+- Delete user's wishlist document
+
+When a user deletes a listing, need to:
+- Delete listing document from listings collection
+- Delete all images in firebase-storage/listings/{uuid}.jpg for the listing
+- Remove listing from all users' wishlists
+*/
