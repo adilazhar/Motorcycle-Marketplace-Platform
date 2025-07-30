@@ -136,18 +136,23 @@ export const handleUserDeletion = functions.auth.user().onDelete(async (user: Us
 
   // 4. Remove deleted listings from other users' wishlists
   if (listingIdsToDelete.length > 0) {
-    const wishlistQuery = db.collection("wishlist").where("listingIds", "array-contains-any", listingIdsToDelete);
-    const wishlistsToClean = await wishlistQuery.get();
+    // Firestore 'array-contains-any' queries are limited to 10 items.
+    const CHUNK_SIZE = 10;
+    for (let i = 0; i < listingIdsToDelete.length; i += CHUNK_SIZE) {
+      const chunk = listingIdsToDelete.slice(i, i + CHUNK_SIZE);
 
-    wishlistsToClean.forEach((doc) => {
-      // No need to clean the deleted user's own wishlist
-      if (doc.id !== uid) {
-        logger.log(`Cleaning listings from wishlist of user ${doc.id}`);
-        batch.update(doc.ref, {
-          listingIds: FieldValue.arrayRemove(...listingIdsToDelete),
-        });
-      }
-    });
+      const wishlistQuery = db.collection("wishlist").where("listingIds", "array-contains-any", chunk);
+      const wishlistsToClean = await wishlistQuery.get();
+
+      wishlistsToClean.forEach((doc) => {
+        if (doc.id !== uid) {
+          logger.log(`Cleaning listings from wishlist of user ${doc.id}`);
+          batch.update(doc.ref, {
+            listingIds: FieldValue.arrayRemove(...chunk), // Use the chunk here
+          });
+        }
+      });
+    }
   }
 
   // 5. Commit all batched Firestore writes and wait for image deletions
