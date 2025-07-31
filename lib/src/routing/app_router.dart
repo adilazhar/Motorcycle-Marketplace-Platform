@@ -86,9 +86,11 @@ GoRouter appRouter(Ref ref) {
       final isGoingToSignup = state.uri.path == '/signup';
       // final isGoingToHome = state.uri.path == '/';
       final isLoggedIn = auth.currentUser != null;
-      final isEmailVerified =
-          ref.read(authUserRepositoryProvider).currentUser?.isEmailVerified ??
-              false;
+      final isEmailVerified = true;
+      // TODO: Re-enable email verification logic when email verification is required for login.
+      // final isEmailVerified =
+      //     ref.read(authUserRepositoryProvider).currentUser?.isEmailVerified ??
+      //         false;
 
       // if (isLoggedIn && !isEmailVerified) {
       //   return '/signup?goToVerificationPage=true';

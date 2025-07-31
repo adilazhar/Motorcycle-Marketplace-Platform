@@ -2,6 +2,7 @@ import 'package:bike_listing/firebase_options.dart';
 import 'package:bike_listing/my_app.dart';
 import 'package:bike_listing/src/utils/constant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ void main() async {
   //  firebase emulators:start --import=./seed --export-on-exit
 
   String host = AppConstants.ipAddress;
+  await FirebaseAuth.instance.useAuthEmulator(host, 9099);
   await FirebaseStorage.instance.useStorageEmulator(host, 9199);
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
 
