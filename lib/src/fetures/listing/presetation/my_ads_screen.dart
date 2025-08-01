@@ -54,6 +54,7 @@ class MyAdsScreen extends ConsumerWidget {
                     onTap: () {
                       context.push('/bike_detail', extra: listing);
                     },
+                    showEllipsis: true,
                   );
                 },
               );

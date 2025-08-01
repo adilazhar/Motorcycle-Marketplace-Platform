@@ -126,7 +126,8 @@ class OwnerDetailScreen extends ConsumerWidget {
                       return BikeListCard(
                         listing: listing,
                         onTap: () {
-                          context.push('/bike_detail', extra: listing);
+                          context.push('/bike_detail?toShowUserCard=false',
+                              extra: listing);
                         },
                       );
                     },

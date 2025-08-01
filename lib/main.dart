@@ -25,20 +25,10 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
+// TODO: Hide the Wishlist icon in the My Ads Screen and the Bike Detail Screen
 // TODO: Make the Bike Detail Screen configurable to show or hide the user account card
-// Todo: Delete All User Listings When A User Deletes his Account
-// Todo: totalListings, how to increase and decrease the listings count on creating and deleting the listing
 // Todo: Add the editing page , user listing page
-// TODO: Add the delete button to listings
-
 // TODO: Add Security Rules to Firestore
-// TODO: When a User deletes its account delete all the ads and also clear his data from the firestore
-// TODO: Learn How to Create A Kanban Board By Learning to create a ReorderableListView
-
-// TODO: Optimize the WishList Icon Button For the Bike Detail Screen
-// TODO: Add Search bar to the registration city enum add form
-
-// TODO: Create User Card And Show it in each detail screen in the end , on click navigates the user to that user listings page
 
 /* 
 Here is the firestore collections for my app :

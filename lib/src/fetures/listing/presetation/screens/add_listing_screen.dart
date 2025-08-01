@@ -237,73 +237,100 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    try {
-      // Show loading state
-      _locationController.text = 'Getting location...';
+    /// NOTE: The location is hardcoded for development and testing purposes only.
+    /// This bypasses the use of GPS/location services to simplify testing and avoid
+    /// permission issues on simulators/emulators or during CI runs.
+    ///
+    /// TODO: Revert to actual location services (see commented-out _getCurrentLocation)
+    /// before releasing to production, so users' real locations are used.
+    const String hardcodedLocation = 'Dera Ghazi Khan, Punjab';
+    const GeoPoint hardcodedCoordinates = GeoPoint(30.0328, 70.6401);
 
-      // Request location permission
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          _locationController.text = 'Tap to Get Location';
-          throw Exception('Location permission denied');
-        }
-      }
+    setState(() {
+      _location = hardcodedLocation;
+      _locationController.text = hardcodedLocation;
+      _coordinates = hardcodedCoordinates;
+    });
 
-      // Get location with accuracy
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: AndroidSettings(accuracy: LocationAccuracy.best),
+    // Optionally, show a message to indicate that a hardcoded location is being used.
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Using hardcoded location for testing.'),
+        ),
       );
-
-      _coordinates = GeoPoint(position.latitude, position.longitude);
-
-      final placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-
-        // Build address components
-        List<String> addressParts = [];
-
-        if (place.subLocality?.isNotEmpty == true) {
-          addressParts.add(place.subLocality!);
-        }
-        if (place.locality?.isNotEmpty == true) {
-          addressParts.add(place.locality!);
-        }
-        if (place.subAdministrativeArea?.isNotEmpty == true &&
-            place.subAdministrativeArea != place.locality) {
-          addressParts.add(place.subAdministrativeArea!);
-        }
-        if (place.administrativeArea?.isNotEmpty == true) {
-          addressParts.add(place.administrativeArea!);
-        }
-
-        // Filter out any plus codes (they usually contain '+' character)
-        addressParts =
-            addressParts.where((part) => !part.contains('+')).toList();
-
-        // Join with commas
-        final address = addressParts.join(', ');
-
-        setState(() {
-          _location = address;
-          _locationController.text = address;
-        });
-      }
-    } catch (e) {
-      _locationController.text = 'Tap to Get Location';
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error getting location: $e')),
-        );
-      }
     }
   }
+
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     // Show loading state
+  //     _locationController.text = 'Getting location...';
+
+  //     // Request location permission
+  //     LocationPermission permission = await Geolocator.checkPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       permission = await Geolocator.requestPermission();
+  //       if (permission == LocationPermission.denied) {
+  //         _locationController.text = 'Tap to Get Location';
+  //         throw Exception('Location permission denied');
+  //       }
+  //     }
+
+  //     // Get location with accuracy
+  //     final position = await Geolocator.getCurrentPosition(
+  //       locationSettings: AndroidSettings(accuracy: LocationAccuracy.best),
+  //     );
+
+  //     _coordinates = GeoPoint(position.latitude, position.longitude);
+
+  //     final placemarks = await placemarkFromCoordinates(
+  //       position.latitude,
+  //       position.longitude,
+  //     );
+
+  //     if (placemarks.isNotEmpty) {
+  //       final place = placemarks.first;
+
+  //       // Build address components
+  //       List<String> addressParts = [];
+
+  //       if (place.subLocality?.isNotEmpty == true) {
+  //         addressParts.add(place.subLocality!);
+  //       }
+  //       if (place.locality?.isNotEmpty == true) {
+  //         addressParts.add(place.locality!);
+  //       }
+  //       if (place.subAdministrativeArea?.isNotEmpty == true &&
+  //           place.subAdministrativeArea != place.locality) {
+  //         addressParts.add(place.subAdministrativeArea!);
+  //       }
+  //       if (place.administrativeArea?.isNotEmpty == true) {
+  //         addressParts.add(place.administrativeArea!);
+  //       }
+
+  //       // Filter out any plus codes (they usually contain '+' character)
+  //       addressParts =
+  //           addressParts.where((part) => !part.contains('+')).toList();
+
+  //       // Join with commas
+  //       final address = addressParts.join(', ');
+
+  //       setState(() {
+  //         _location = address;
+  //         _locationController.text = address;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     _locationController.text = 'Tap to Get Location';
+  //     log(e.toString());
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Error getting location: $e')),
+  //       );
+  //     }
+  //   }
+  // }
 
   Widget proxyDecor(Widget child, int index, Animation<double> animation) {
     return AnimatedBuilder(

@@ -143,10 +143,13 @@ GoRouter appRouter(Ref ref) {
         path: '/bike_detail',
         pageBuilder: (context, state) {
           final listing = state.extra as Listing;
+          final toShowUserCard =
+              state.uri.queryParameters['toShowUserCard'] == 'true' ||
+                  state.uri.queryParameters['toShowUserCard'] == null;
           return buildPageWithBottomUpTransition(
             context: context,
             state: state,
-            child: BikeDetailScreen(listing),
+            child: BikeDetailScreen(listing, toShowUserCard: toShowUserCard),
           );
         },
         // routes: [

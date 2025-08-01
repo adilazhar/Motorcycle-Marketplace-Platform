@@ -108,29 +108,16 @@ export const handleUserDeletion = functions.auth.user().onDelete(async (user: Us
   const listingsSnapshot = await listingsQuery.get();
 
   const listingIdsToDelete: string[] = [];
-  const imageDeletionPromises: Promise<any>[] = [];
+  // Image deletion for user listings is handled by the onListingDeleted trigger.
+  // If you need to manually delete images here (e.g., if triggers are disabled), re-enable and implement this logic.
+  // const imageDeletionPromises: Promise<any>[] = [];
 
   if (!listingsSnapshot.empty) {
     listingsSnapshot.forEach((doc) => {
       logger.log(`Scheduling deletion of listing: listings/${doc.id}`);
       batch.delete(doc.ref); // Add listing deletion to batch
 
-      const listingData = doc.data() as Listing;
       listingIdsToDelete.push(doc.id);
-
-      // Collect image URLs for deletion
-      if (listingData.imageUrls?.length > 0) {
-        listingData.imageUrls.forEach((url) => {
-          const filePath = getFilePathFromUrl(url);
-          if (filePath) {
-            imageDeletionPromises.push(
-              storage.bucket().file(filePath).delete().catch((err) => {
-                logger.error(`Failed to delete image ${filePath}:`, err);
-              })
-            );
-          }
-        });
-      }
     });
   }
 
@@ -156,7 +143,7 @@ export const handleUserDeletion = functions.auth.user().onDelete(async (user: Us
   }
 
   // 5. Commit all batched Firestore writes and wait for image deletions
-  await Promise.all([batch.commit(), ...imageDeletionPromises]);
+  await batch.commit();
 
   logger.log(`Cleanup complete for user ${uid}.`);
   return null; // Important: Always return null for 1st gen background functions to indicate success
