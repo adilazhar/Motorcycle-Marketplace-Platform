@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/feature_card.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_grid_layout.dart';
 import 'package:bike_listing/src/fetures/listing/presetation/widgets/image_viewer_screen.dart';
@@ -14,7 +16,9 @@ import 'package:latlong2/latlong.dart';
 class BikeDetailScreen extends StatefulWidget {
   final Listing listing;
   final bool toShowUserCard;
-  const BikeDetailScreen(this.listing, {super.key, this.toShowUserCard = true});
+  final bool toShowWishlistIcon;
+  const BikeDetailScreen(this.listing,
+      {super.key, this.toShowUserCard = true, this.toShowWishlistIcon = true});
 
   @override
   State<BikeDetailScreen> createState() => _BikeDetailScreenState();
@@ -65,7 +69,8 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                 onPressed: () => Navigator.pop(context),
               ),
               actions: [
-                WishlistButton(listingId: widget.listing.id),
+                if (widget.toShowWishlistIcon)
+                  WishlistButton(listingId: widget.listing.id),
               ],
               title: Opacity(
                 opacity: opacity,

@@ -146,10 +146,15 @@ GoRouter appRouter(Ref ref) {
           final toShowUserCard =
               state.uri.queryParameters['toShowUserCard'] == 'true' ||
                   state.uri.queryParameters['toShowUserCard'] == null;
+          final toShowWishlistIcon =
+              state.uri.queryParameters['toShowWishlistIcon'] == 'true' ||
+                  state.uri.queryParameters['toShowWishlistIcon'] == null;
           return buildPageWithBottomUpTransition(
             context: context,
             state: state,
-            child: BikeDetailScreen(listing, toShowUserCard: toShowUserCard),
+            child: BikeDetailScreen(listing,
+                toShowUserCard: toShowUserCard,
+                toShowWishlistIcon: toShowWishlistIcon),
           );
         },
         // routes: [
