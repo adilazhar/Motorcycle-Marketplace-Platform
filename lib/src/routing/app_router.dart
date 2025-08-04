@@ -215,6 +215,17 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
+      GoRoute(
+        path: '/edit_listing',
+        pageBuilder: (context, state) {
+          final listing = state.extra as Listing?;
+          return buildPageWithBottomUpTransition(
+            context: context,
+            state: state,
+            child: AddListingScreen(listingToEdit: listing),
+          );
+        },
+      ),
     ],
   );
 }

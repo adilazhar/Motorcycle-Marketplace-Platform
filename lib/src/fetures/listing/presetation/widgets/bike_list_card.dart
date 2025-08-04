@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class BikeListCard extends ConsumerWidget {
   final Listing listing;
@@ -96,12 +96,8 @@ class BikeListCard extends ConsumerWidget {
                                   ],
                                   onSelected: (value) {
                                     if (value == 'edit') {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (_) => AddListingScreen(
-                                              listingToEdit: listing),
-                                        ),
-                                      );
+                                      context.push('/edit_listing',
+                                          extra: listing);
                                     } else if (value == 'delete') {
                                       showDialog(
                                         context: context,

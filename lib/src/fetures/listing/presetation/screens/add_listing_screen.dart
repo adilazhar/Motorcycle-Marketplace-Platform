@@ -23,7 +23,6 @@ class AddListingScreen extends ConsumerStatefulWidget {
 
 class _AddListingScreenState extends ConsumerState<AddListingScreen> {
   final ImagePicker _picker = ImagePicker();
-  // List<File> selectedImages = [];
   List<Object> listingImages = [];
 
   final _formKey = GlobalKey<FormBuilderState>();
@@ -565,6 +564,9 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Brand *'),
                   FormBuilderField(
                     name: 'brand',
+                    initialValue: isEditMode && _selectedBrand != null
+                        ? _selectedBrand!.name
+                        : null,
                     validator: FormBuilderValidators.required(
                         errorText: 'Please select a brand'),
                     builder: (field) {
@@ -611,6 +613,9 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Model *'),
                   FormBuilderField(
                     name: 'model',
+                    initialValue: isEditMode && _selectedModel.isNotEmpty
+                        ? _selectedModel
+                        : null,
                     validator: FormBuilderValidators.required(
                         errorText: 'Please select a model'),
                     builder: (field) {
@@ -697,6 +702,9 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Engine Capacity *'),
                   FormBuilderField(
                     name: 'engineCapacity',
+                    initialValue: isEditMode && _selectedEngineCapacity != null
+                        ? _selectedEngineCapacity!.name
+                        : null,
                     validator: FormBuilderValidators.required(
                         errorText: 'Please select engine capacity'),
                     builder: (field) {
@@ -824,6 +832,10 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Registration City'),
                   FormBuilderField(
                     name: 'registrationCity',
+                    initialValue:
+                        isEditMode && _selectedRegistrationCity != null
+                            ? _selectedRegistrationCity!.name
+                            : null,
                     validator: FormBuilderValidators.required(
                         errorText: 'Please select registration city'),
                     builder: (field) {
@@ -1001,7 +1013,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
               width: double.infinity,
               child: ElevatedButton(
                   onPressed: state.isLoading ? null : _saveListing,
-                  child: Text('Submit')))
+                  child: isEditMode ? Text('Update') : Text('Submit')))
         ],
       ),
     );
