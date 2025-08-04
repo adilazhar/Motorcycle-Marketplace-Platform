@@ -94,6 +94,7 @@ class OwnerDetailScreen extends ConsumerWidget {
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                       overflow: TextOverflow.ellipsis,
                     ),
+                    Text(userMeta.email!, style: TextStyle(color: Colors.grey)),
                     Text(joinDateString, style: TextStyle(color: Colors.grey)),
                   ],
                 ),
