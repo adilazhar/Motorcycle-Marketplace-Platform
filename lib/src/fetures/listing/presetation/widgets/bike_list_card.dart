@@ -29,203 +29,206 @@ class BikeListCard extends ConsumerWidget {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: onTap,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 160,
-              height: 200,
-              child: CachedNetworkImage(
-                imageUrl: listing.imageUrls[0],
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(Icons.error),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 2,
+                child: CachedNetworkImage(
+                  imageUrl: listing.imageUrls[0],
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Center(
+                    child: Icon(Icons.error),
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 8,
-                          child: Text(
-                            listing.formattedPrice,
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 8,
+                            child: Text(
+                              listing.formattedPrice,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: showEllipsis
+                                ? PopupMenuButton(
+                                    icon: Icon(Icons.more_vert),
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.edit),
+                                            SizedBox(width: 8),
+                                            Text('Edit'),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.delete),
+                                            SizedBox(width: 8),
+                                            Text('Delete'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        context.push('/edit_listing',
+                                            extra: listing);
+                                      } else if (value == 'delete') {
+                                        showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (context) {
+                                            bool isLoading = false;
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return AlertDialog(
+                                                  title: Text('Confirm Delete'),
+                                                  content: Text(
+                                                      'Are you sure you want to delete this listing?'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: isLoading
+                                                          ? null
+                                                          : () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                      child: Text('Cancel'),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: isLoading
+                                                          ? null
+                                                          : () async {
+                                                              setState(() {
+                                                                isLoading =
+                                                                    true;
+                                                              });
+                                                              try {
+                                                                await ref
+                                                                    .read(
+                                                                        listingRepositoryProvider)
+                                                                    .deleteListing(
+                                                                        listing
+                                                                            .id);
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  SnackBar(
+                                                                      content: Text(
+                                                                          'Listing deleted successfully!')),
+                                                                );
+                                                              } catch (e) {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  SnackBar(
+                                                                      content: Text(
+                                                                          'Failed to delete listing: $e')),
+                                                                );
+                                                              }
+                                                            },
+                                                      child: isLoading
+                                                          ? SizedBox(
+                                                              width: 20,
+                                                              height: 20,
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            )
+                                                          : Text('Delete'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                  )
+                                : WishlistButton(listingId: listing.id),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            listing.title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            listing.location,
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                              fontSize: 12,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: showEllipsis
-                              ? PopupMenuButton(
-                                  icon: Icon(Icons.more_vert),
-                                  itemBuilder: (context) => [
-                                    PopupMenuItem(
-                                      value: 'edit',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.edit),
-                                          SizedBox(width: 8),
-                                          Text('Edit'),
-                                        ],
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 'delete',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete),
-                                          SizedBox(width: 8),
-                                          Text('Delete'),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                  onSelected: (value) {
-                                    if (value == 'edit') {
-                                      context.push('/edit_listing',
-                                          extra: listing);
-                                    } else if (value == 'delete') {
-                                      showDialog(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        builder: (context) {
-                                          bool isLoading = false;
-                                          return StatefulBuilder(
-                                            builder: (context, setState) {
-                                              return AlertDialog(
-                                                title: Text('Confirm Delete'),
-                                                content: Text(
-                                                    'Are you sure you want to delete this listing?'),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: isLoading
-                                                        ? null
-                                                        : () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                    child: Text('Cancel'),
-                                                  ),
-                                                  ElevatedButton(
-                                                    onPressed: isLoading
-                                                        ? null
-                                                        : () async {
-                                                            setState(() {
-                                                              isLoading = true;
-                                                            });
-                                                            try {
-                                                              await ref
-                                                                  .read(
-                                                                      listingRepositoryProvider)
-                                                                  .deleteListing(
-                                                                      listing
-                                                                          .id);
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                SnackBar(
-                                                                    content: Text(
-                                                                        'Listing deleted successfully!')),
-                                                              );
-                                                            } catch (e) {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                SnackBar(
-                                                                    content: Text(
-                                                                        'Failed to delete listing: $e')),
-                                                              );
-                                                            }
-                                                          },
-                                                    child: isLoading
-                                                        ? SizedBox(
-                                                            width: 20,
-                                                            height: 20,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              strokeWidth: 2,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          )
-                                                        : Text('Delete'),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                      );
-                                    }
-                                  },
-                                )
-                              : WishlistButton(listingId: listing.id),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          listing.title,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          const SizedBox(height: 4),
+                          Text(
+                            listing.cardYearAndMileage,
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          listing.location,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          listing.cardYearAndMileage,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      listing.timeAgo(),
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 12,
+                        ],
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 20),
+                      Text(
+                        listing.timeAgo(),
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

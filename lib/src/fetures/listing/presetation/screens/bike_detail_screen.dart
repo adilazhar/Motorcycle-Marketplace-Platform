@@ -226,15 +226,11 @@ class _BikeDetailScreenState extends State<BikeDetailScreen> {
                   const Text('Details',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  GridView(
+                  ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 2.5,
-                      crossAxisSpacing: 16,
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8,
                     ),
                     children: [
                       FeatureCard(

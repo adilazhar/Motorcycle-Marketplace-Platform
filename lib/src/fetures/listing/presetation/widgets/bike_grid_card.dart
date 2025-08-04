@@ -23,11 +23,10 @@ class BikeGridCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              width: 205,
-              height: 120,
+            Expanded(
+              flex: 5,
               child: CachedNetworkImage(
                 imageUrl: listing.imageUrls[0],
                 fit: BoxFit.cover,
@@ -35,8 +34,6 @@ class BikeGridCard extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 ),
                 errorWidget: (context, url, error) {
-                  debugPrint(url);
-                  debugPrint(error.toString());
                   return const Center(
                     child: Icon(Icons.error),
                   );
@@ -44,6 +41,7 @@ class BikeGridCard extends StatelessWidget {
               ),
             ),
             Expanded(
+              flex: 7,
               child: Padding(
                 padding: const EdgeInsets.all(08.0),
                 child: Column(
