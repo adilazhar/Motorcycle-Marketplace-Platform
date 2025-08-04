@@ -182,6 +182,17 @@ GoRouter appRouter(Ref ref) {
         },
       ),
       GoRoute(
+        path: '/edit_listing',
+        pageBuilder: (context, state) {
+          final listing = state.extra as Listing?;
+          return buildPageWithBottomUpTransition(
+            context: context,
+            state: state,
+            child: AddListingScreen(listingToEdit: listing),
+          );
+        },
+      ),
+      GoRoute(
         path: '/account',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
             context: context, state: state, child: AccountScreen()),
@@ -214,17 +225,6 @@ GoRouter appRouter(Ref ref) {
                 child: PasswordResetEmailSentScreen()),
           ),
         ],
-      ),
-      GoRoute(
-        path: '/edit_listing',
-        pageBuilder: (context, state) {
-          final listing = state.extra as Listing?;
-          return buildPageWithBottomUpTransition(
-            context: context,
-            state: state,
-            child: AddListingScreen(listingToEdit: listing),
-          );
-        },
       ),
     ],
   );
