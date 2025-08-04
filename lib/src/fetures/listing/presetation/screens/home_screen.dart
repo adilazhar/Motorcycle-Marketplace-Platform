@@ -64,7 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8.0),
         child: FirestoreQueryBuilder<Listing>(
           query: ref.read(listingRepositoryProvider).getListingsQuery(),
           builder: (context, snapshot, _) {
