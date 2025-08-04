@@ -25,8 +25,6 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-// TODO: Hide the Wishlist icon in the My Ads Screen and the Bike Detail Screen
-// TODO: Make the Bike Detail Screen configurable to show or hide the user account card
 // TODO: Make the Bike Listing card responsive to the screen size
 // TODO: Add the editing page , user listing page
 // If the user returns without doing anything do nothing , if the user updates then make sure that you delete the old images if the user has modified the images
