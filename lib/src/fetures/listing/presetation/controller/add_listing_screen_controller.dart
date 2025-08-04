@@ -23,4 +23,23 @@ class AddListingScreenController extends _$AddListingScreenController {
       goRouter.pop();
     }
   }
+
+  Future<void> updateListing(
+    Listing listing, {
+    List<File>? newImages,
+    List<String>? deletedImageUrls,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(listingServiceProvider).updateListing(
+            listing,
+            newImages: newImages,
+            deletedImageUrls: deletedImageUrls,
+          );
+    });
+    if (!state.hasError) {
+      final goRouter = ref.read(appRouterProvider);
+      goRouter.pop();
+    }
+  }
 }

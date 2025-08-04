@@ -5,6 +5,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:bike_listing/src/fetures/listing/presetation/screens/add_listing_screen.dart';
+
 class BikeListCard extends ConsumerWidget {
   final Listing listing;
   final VoidCallback onTap;
@@ -66,6 +68,7 @@ class BikeListCard extends ConsumerWidget {
                           ),
                         ),
                         Expanded(
+                          flex: 2,
                           child: showEllipsis
                               ? PopupMenuButton(
                                   icon: Icon(Icons.more_vert),
@@ -92,7 +95,14 @@ class BikeListCard extends ConsumerWidget {
                                     ),
                                   ],
                                   onSelected: (value) {
-                                    if (value == 'delete') {
+                                    if (value == 'edit') {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => AddListingScreen(
+                                              listingToEdit: listing),
+                                        ),
+                                      );
+                                    } else if (value == 'delete') {
                                       showDialog(
                                         context: context,
                                         barrierDismissible: false,

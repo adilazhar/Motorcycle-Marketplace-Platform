@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddListingScreen extends ConsumerStatefulWidget {
-  const AddListingScreen({super.key});
+  const AddListingScreen({super.key, this.listingToEdit});
+
+  final Listing? listingToEdit;
 
   @override
   ConsumerState<AddListingScreen> createState() => _AddListingScreenState();
@@ -23,7 +23,8 @@ class AddListingScreen extends ConsumerStatefulWidget {
 
 class _AddListingScreenState extends ConsumerState<AddListingScreen> {
   final ImagePicker _picker = ImagePicker();
-  List<File> selectedImages = [];
+  // List<File> selectedImages = [];
+  List<Object> listingImages = [];
 
   final _formKey = GlobalKey<FormBuilderState>();
   late TextEditingController _titleController;
@@ -36,13 +37,28 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
   RegistrationCity? _selectedRegistrationCity;
   GeoPoint? _coordinates;
   String _location = '';
+  bool get isEditMode => widget.listingToEdit != null;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController();
-    _descriptionController = TextEditingController();
-    _locationController = TextEditingController(text: 'Tap to Get Location');
+    if (isEditMode) {
+      final listing = widget.listingToEdit!;
+      _titleController = TextEditingController(text: listing.title);
+      _descriptionController = TextEditingController(text: listing.description);
+      _locationController = TextEditingController(text: listing.location);
+      _selectedBrand = listing.brand;
+      _selectedModel = listing.model;
+      _selectedEngineCapacity = listing.engineCapacity;
+      _selectedRegistrationCity = listing.registrationCity;
+      _coordinates = listing.coordinates;
+      _location = listing.location;
+      listingImages = List<String>.from(listing.imageUrls);
+    } else {
+      _titleController = TextEditingController();
+      _descriptionController = TextEditingController();
+      _locationController = TextEditingController(text: 'Tap to Get Location');
+    }
   }
 
   @override
@@ -53,10 +69,10 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
     super.dispose();
   }
 
-  void _saveListing() {
+  void _saveListing() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // First check if images are selected
-      if (selectedImages.isEmpty) {
+      // Check if at least one image is present
+      if (listingImages.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Please select at least one image')),
         );
@@ -82,28 +98,62 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
         return;
       }
 
-      final Listing listing = Listing(
-        id: '',
-        imageUrls: [],
-        brand: _selectedBrand!,
-        model: _selectedModel,
-        year: int.parse(formData['year']),
-        engineCapacity: _selectedEngineCapacity!,
-        mileage: int.parse(formData['mileage']),
-        isSelfStart: formData['isSelfStart'],
-        isNew: formData['condition'],
-        registrationCity: _selectedRegistrationCity!,
-        title: _titleController.text,
-        description: _descriptionController.text,
-        location: _location,
-        coordinates: GeoPoint(_coordinates!.latitude, _coordinates!.longitude),
-        price: int.parse(formData['price']),
-        userId: '',
-      );
-
-      ref
-          .read(addListingScreenControllerProvider.notifier)
-          .createListing(listing, selectedImages);
+      if (isEditMode) {
+        // Editing existing listing
+        final oldListing = widget.listingToEdit!;
+        // Find deleted images
+        final deletedImageUrls = oldListing.imageUrls
+            .where((url) => !listingImages.whereType<String>().contains(url))
+            .toList();
+        // Build updated listing
+        final updatedListing = oldListing.copyWith(
+          brand: _selectedBrand!,
+          model: _selectedModel,
+          year: int.parse(formData['year']),
+          engineCapacity: _selectedEngineCapacity!,
+          mileage: int.parse(formData['mileage']),
+          isSelfStart: formData['isSelfStart'],
+          isNew: formData['condition'],
+          registrationCity: _selectedRegistrationCity!,
+          title: _titleController.text,
+          description: _descriptionController.text,
+          location: _location,
+          coordinates:
+              GeoPoint(_coordinates!.latitude, _coordinates!.longitude),
+          price: int.parse(formData['price']),
+        );
+        await ref
+            .read(addListingScreenControllerProvider.notifier)
+            .updateListing(
+              updatedListing,
+              newImages: listingImages.whereType<File>().toList(),
+              deletedImageUrls: deletedImageUrls,
+            );
+      } else {
+        // Creating new listing
+        final Listing listing = Listing(
+          id: '',
+          imageUrls: [],
+          brand: _selectedBrand!,
+          model: _selectedModel,
+          year: int.parse(formData['year']),
+          engineCapacity: _selectedEngineCapacity!,
+          mileage: int.parse(formData['mileage']),
+          isSelfStart: formData['isSelfStart'],
+          isNew: formData['condition'],
+          registrationCity: _selectedRegistrationCity!,
+          title: _titleController.text,
+          description: _descriptionController.text,
+          location: _location,
+          coordinates:
+              GeoPoint(_coordinates!.latitude, _coordinates!.longitude),
+          price: int.parse(formData['price']),
+          userId: '',
+        );
+        ref
+            .read(addListingScreenControllerProvider.notifier)
+            .createListing(listing, listingImages.whereType<File>().toList());
+      }
     } else {
       // Form validation failed
       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,9 +247,15 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
         .toList();
     if (pickedFile.isNotEmpty) {
       setState(() {
-        selectedImages.addAll(finalImages);
+        listingImages.addAll(finalImages);
       });
     }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      listingImages.removeAt(index);
+    });
   }
 
   Future<void> _showEditOptions(int index) async {
@@ -217,7 +273,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                 title: Text('Remove image'),
                 onTap: () {
                   setState(() {
-                    selectedImages.removeAt(index);
+                    listingImages.removeAt(index);
                   });
                   Navigator.pop(context);
                 },
@@ -345,10 +401,13 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
             child: SizedBox(
               height: 60,
               width: 60,
-              child: Image.file(
-                selectedImages[index],
-                fit: BoxFit.cover,
-              ),
+              child: listingImages[index] is File
+                  ? Image.file(
+                      listingImages[index] as File,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(listingImages[index] as String,
+                      fit: BoxFit.cover),
             ),
           ),
         );
@@ -393,7 +452,7 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                       border: Border.all(color: Colors.black, width: 1.0),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: selectedImages.isEmpty
+                    child: listingImages.isEmpty
                         ? Padding(
                             padding: EdgeInsets.all(16),
                             child: Column(
@@ -444,21 +503,21 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                                               if (oldIndex < newIndex) {
                                                 newIndex -= 1;
                                               }
-                                              final File item = selectedImages
+                                              final Object item = listingImages
                                                   .removeAt(oldIndex);
-                                              selectedImages.insert(
+                                              listingImages.insert(
                                                   newIndex, item);
                                             });
                                           },
-                                          children: selectedImages
+                                          children: listingImages
                                               .asMap()
                                               .entries
                                               .map((entry) {
                                             int index = entry.key;
-                                            File image = entry.value;
+                                            Object image = entry.value;
                                             return Padding(
-                                              key: ValueKey(image
-                                                  .path), // Unique key for each item
+                                              key: ValueKey(
+                                                  image), // Unique key for each item
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: 5),
                                               child: GestureDetector(
@@ -471,10 +530,15 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                                                   child: SizedBox(
                                                     height: 60,
                                                     width: 60,
-                                                    child: Image.file(
-                                                      image,
-                                                      fit: BoxFit.cover,
-                                                    ),
+                                                    child: image is File
+                                                        ? Image.file(
+                                                            image,
+                                                            fit: BoxFit.cover,
+                                                          )
+                                                        : Image.network(
+                                                            image as String,
+                                                            fit: BoxFit.cover,
+                                                          ),
                                                   ),
                                                 ),
                                               ),
@@ -600,6 +664,9 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Year *'),
                   FormBuilderTextField(
                     name: 'year',
+                    initialValue: isEditMode
+                        ? widget.listingToEdit!.year.toString()
+                        : null,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8)),
@@ -676,6 +743,9 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('KM\'s Driven &'),
                   FormBuilderTextField(
                     name: 'mileage',
+                    initialValue: isEditMode
+                        ? widget.listingToEdit!.mileage.toString()
+                        : null,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8)),
@@ -700,6 +770,8 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Ignition Type *'),
                   FormBuilderChoiceChips(
                     name: 'isSelfStart',
+                    initialValue:
+                        isEditMode ? widget.listingToEdit!.isSelfStart : null,
                     showCheckmark: false,
                     spacing: 10,
                     validator: FormBuilderValidators.required(
@@ -726,6 +798,8 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Condition *'),
                   FormBuilderChoiceChips(
                     name: 'condition',
+                    initialValue:
+                        isEditMode ? widget.listingToEdit!.isNew : null,
                     showCheckmark: false,
                     spacing: 10,
                     decoration: InputDecoration.collapsed(hintText: ''),
@@ -888,6 +962,9 @@ class _AddListingScreenState extends ConsumerState<AddListingScreen> {
                   Text('Price *'),
                   FormBuilderTextField(
                     name: 'price',
+                    initialValue: isEditMode
+                        ? widget.listingToEdit!.price.toString()
+                        : null,
                     decoration: InputDecoration(
                       prefixText: 'Rs-',
                       border: OutlineInputBorder(
