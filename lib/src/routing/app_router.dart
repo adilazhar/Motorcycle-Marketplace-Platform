@@ -38,14 +38,13 @@ GoRouter appRouter(Ref ref) {
         const end = Offset.zero;
         const curve = Curves.easeInOut;
 
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween = Tween(
+          begin: begin,
+          end: end,
+        ).chain(CurveTween(curve: curve));
         var offsetAnimation = animation.drive(tween);
 
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
-        );
+        return SlideTransition(position: offsetAnimation, child: child);
       },
     );
   }
@@ -63,14 +62,13 @@ GoRouter appRouter(Ref ref) {
         const end = Offset.zero;
         const curve = Curves.easeInOut;
 
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween = Tween(
+          begin: begin,
+          end: end,
+        ).chain(CurveTween(curve: curve));
         var offsetAnimation = animation.drive(tween);
 
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
-        );
+        return SlideTransition(position: offsetAnimation, child: child);
       },
     );
   }
@@ -118,16 +116,26 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: '/',
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                context: context, state: state, child: HomeScreen()),
+              context: context,
+              state: state,
+              child: HomeScreen(),
+            ),
           ),
           GoRoute(
-              path: '/wishlist',
-              pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                  context: context, state: state, child: WishlistScreen())),
+            path: '/wishlist',
+            pageBuilder: (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: WishlistScreen(),
+            ),
+          ),
           GoRoute(
             path: '/my_ads',
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                context: context, state: state, child: MyAdsScreen()),
+              context: context,
+              state: state,
+              child: MyAdsScreen(),
+            ),
           ),
           GoRoute(
             path: '/account',
@@ -145,31 +153,20 @@ GoRouter appRouter(Ref ref) {
           final listing = state.extra as Listing;
           final toShowUserCard =
               state.uri.queryParameters['toShowUserCard'] == 'true' ||
-                  state.uri.queryParameters['toShowUserCard'] == null;
+              state.uri.queryParameters['toShowUserCard'] == null;
           final toShowWishlistIcon =
               state.uri.queryParameters['toShowWishlistIcon'] == 'true' ||
-                  state.uri.queryParameters['toShowWishlistIcon'] == null;
+              state.uri.queryParameters['toShowWishlistIcon'] == null;
           return buildPageWithBottomUpTransition(
             context: context,
             state: state,
-            child: BikeDetailScreen(listing,
-                toShowUserCard: toShowUserCard,
-                toShowWishlistIcon: toShowWishlistIcon),
+            child: BikeDetailScreen(
+              listing,
+              toShowUserCard: toShowUserCard,
+              toShowWishlistIcon: toShowWishlistIcon,
+            ),
           );
         },
-        // routes: [
-        //   GoRoute(
-        //     path: 'owner_detail',
-        //     pageBuilder: (context, state) {
-        //       final ownerId = state.extra as String;
-        //       return buildPageWithBottomUpTransition(
-        //         context: context,
-        //         state: state,
-        //         child: OwnerDetailScreen(ownerId),
-        //       );
-        //     },
-        //   ),
-        // ],
       ),
       GoRoute(
         path: '/sell',
@@ -195,34 +192,50 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/account',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
-            context: context, state: state, child: AccountScreen()),
+          context: context,
+          state: state,
+          child: AccountScreen(),
+        ),
       ),
       GoRoute(
         path: '/login',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
-            context: context, state: state, child: LoginScreen()),
+          context: context,
+          state: state,
+          child: LoginScreen(),
+        ),
       ),
       GoRoute(
         path: '/signup',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
-            context: context, state: state, child: SignupScreen()),
+          context: context,
+          state: state,
+          child: SignupScreen(),
+        ),
       ),
       GoRoute(
         path: '/name_entry',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
-            context: context, state: state, child: NameEntryScreen()),
+          context: context,
+          state: state,
+          child: NameEntryScreen(),
+        ),
       ),
       GoRoute(
         path: '/forgot_password',
         pageBuilder: (context, state) => buildPageWithDefaultTransition(
-            context: context, state: state, child: ForgotPasswordScreen()),
+          context: context,
+          state: state,
+          child: ForgotPasswordScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'email_sent',
             pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                context: context,
-                state: state,
-                child: PasswordResetEmailSentScreen()),
+              context: context,
+              state: state,
+              child: PasswordResetEmailSentScreen(),
+            ),
           ),
         ],
       ),
